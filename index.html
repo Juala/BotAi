@@ -250,34 +250,27 @@
     appendUser(msg);
     input.value = "";
 
-    // Animated typing indicator
+    // tampilkan animated typing indicator
     const typingDiv = appendBot("", true);
     conversationHistory.push({ role: "user", content: msg });
 
     try {
-      // Context-Aware Prompt
-      const contextPrompt = conversationHistory.map(m => {
-        return `${m.role === "user" ? "User" : "AI"}: ${m.content}`;
-      }).join("\n");
-
+      const prompt = conversationHistory.map(m => `${m.role}: ${m.content}`).join("\n");
       const res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents: [{ parts: [{ text: contextPrompt }] }] })
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
       });
-
       const data = await res.json();
       const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Tidak ada respons dari AI.";
 
-      // Update typing indicator menjadi jawaban AI
+      // update typing indicator menjadi jawaban AI
       typingDiv.innerHTML = `<pre>${reply}</pre><button class="copy-btn" onclick="copyText(this)">Copy</button>`;
       conversationHistory.push({ role: "model", content: reply });
-
     } catch (err) {
       console.error(err);
       typingDiv.textContent = "❌ Gagal menghubungi API Gemini.";
     }
-
     saveChat();
     chatBox.scrollTop = chatBox.scrollHeight;
   }
@@ -304,7 +297,7 @@
     chatBox.appendChild(div);
     saveChat();
     chatBox.scrollTop = chatBox.scrollHeight;
-    return div; 
+    return div; // untuk update typing nanti
   }
 
   function saveChat() {
@@ -352,6 +345,33 @@
     if (allHistory.length === 0) {
       chatHistoryList.innerHTML = '<li style="color:#aaa;">Belum ada percakapan sebelumnya.</li>';
       return;
+    }
+
+    allHistory.forEach((conv, convIdx) => {
+      const li = document.createElement('li');
+      li.style.background = "#1b214033";
+      li.textContent = `[Percakapan ${convIdx + 1}] ${conv.map(m=>m.content).join(" | ").substring(0,50)}${conv.map(m=>m.content).join(" ").length>50?"...":""}`;
+      li.onclick = () => loadHistoryConversation(convIdx);
+      chatHistoryList.appendChild(li);
+    });
+  }
+
+  function loadHistoryConversation(convIdx) {
+    const allHistory = JSON.parse(localStorage.getItem('roja_all_history') || "[]");
+    if (!allHistory[convIdx]) return;
+
+    chatBox.innerHTML = "";
+    conversationHistory = [...allHistory[convIdx]];
+    conversationHistory.forEach(msg => {
+      if (msg.role === "user") appendUser(msg.content);
+      else appendBot(msg.content);
+    });
+    closeHistory();
+  }
+</script>
+
+</body>
+</html>turn;
     }
 
     allHistory.forEach((conv, convIdx) => {
