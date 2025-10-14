@@ -82,58 +82,99 @@ const chatHistoryPanel = document.getElementById('chatHistoryPanel');
 const chatHistoryList = document.getElementById('chatHistoryList');
 const openHistoryBtn = document.getElementById('openHistoryBtn');
 
-const GEMINI_API_KEY = "AIzaSyC310duBltZgbkMMfqRoAn6qVELo7x2slI"; 
-const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
-
 let conversationHistory = [];
 
-window.onload = function() {
-  const saved = localStorage.getItem('roja_chat');
-  const savedHistory = localStorage.getItem('roja_history');
-  if (saved) {
-    chatBox.innerHTML = saved;
-    conversationHistory = JSON.parse(savedHistory || "[]");
-  } else {
-    appendBot("Halo, aku Roja AI 🤖. Ada yang bisa aku bantu hari ini?");
-  }
-  chatBox.scrollTop = chatBox.scrollHeight;
+// ===== MULTI PLATFORM + MULTI KEY =====
+const AI_SERVICES = {
+  openai: { url: "https://api.openai.com/v1/chat/completions", keys: ["OPENAI_KEY_1","OPENAI_KEY_2"] },
+  huggingface: { url: "https://api-inference.huggingface.co/models/gpt2", keys: ["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","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"] },
+  gemini: { url: "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent", keys: ["AIzaSyAWp2kVH-POMYbsSYEM90Th67HI2OJxGw4","AIzaSyC310duBltZgbkMMfqRoAn6qVELo7x2slI"] }
 };
 
+function getRandomKey(service) {
+  const keys = AI_SERVICES[service].keys;
+  return keys[Math.floor(Math.random() * keys.length)];
+}
+
+function selectService(msg) {
+  if (/buatkan kode|html|css|js|php|python/i.test(msg)) return "openai";
+  else if (/buatkan jawaban|cerita|puisi|chat biasa/i.test(msg)) return "huggingface";
+  else return "gemini";
+}
+
+async function callAI(msg) {
+  const service = selectService(msg);
+  const key = getRandomKey(service);
+  let reply = "";
+
+  if(service === "openai") {
+    const res = await fetch(AI_SERVICES[service].url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${key}` },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: conversationHistory.map(m => ({ role: m.role==="user"?"user":"assistant", content: m.content }))
+      })
+    });
+    const data = await res.json();
+    reply = data.choices?.[0]?.message?.content || "⚠️ Tidak ada respons";
+  } else if(service === "huggingface") {
+    const res = await fetch(AI_SERVICES[service].url, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ inputs: msg })
+    });
+    const data = await res.json();
+    reply = data.generated_text || "⚠️ Tidak ada respons";
+  } else if(service === "gemini") {
+    const res = await fetch(`${AI_SERVICES[service].url}?key=${key}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contents: [{ parts: [{ text: msg }] }] })
+    });
+    const data = await res.json();
+    reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Tidak ada respons";
+  }
+  return reply;
+}
+
+// ===== SEND MESSAGE =====
 async function sendMessage() {
   const msg = input.value.trim();
   if (!msg) return;
+
   appendUser(msg);
   input.value = "";
-
   const typingDiv = appendBot("", true);
   conversationHistory.push({ role: "user", content: msg });
 
   try {
-    const contextPrompt = conversationHistory.map(m => `${m.role === "user" ? "User" : "AI"}: ${m.content}`).join("\n");
-    const res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contents: [{ parts: [{ text: contextPrompt }] }] })
-    });
-    const data = await res.json();
-    let reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Tidak ada respons dari AI.";
+    const reply = await callAI(msg);
+    const isCodeRequest = /buatkan kode|html|css|javascript|js|php|python/i.test(msg);
+    typingDiv.innerHTML = isCodeRequest
+      ? `<pre><code>${reply.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</code></pre><button class="copy-btn" onclick="copyText(this,true)">Copy</button>`
+      : `${reply}<button class="copy-btn" onclick="copyText(this)">Copy</button>`;
 
-    const isCodeRequest = /buatkan kode|html|css|javascript|js|php|python|csharp|java/i.test(msg);
-    if (isCodeRequest) {
-      reply = `<pre><code>${reply.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</code></pre>`;
-    }
-
-    typingDiv.innerHTML = `${reply}<button class="copy-btn" onclick="copyText(this, ${isCodeRequest})">Copy</button>`;
     conversationHistory.push({ role: "model", content: reply });
-
-  } catch (err) {
+  } catch(err) {
+    typingDiv.textContent = "❌ Gagal menghubungi AI.";
     console.error(err);
-    typingDiv.textContent = "❌ Gagal menghubungi API Gemini.";
   }
 
   saveChat();
   chatBox.scrollTop = chatBox.scrollHeight;
 }
+
+// ===== CHAT HISTORY & HELPER =====
+window.onload = function() {
+  const saved = localStorage.getItem('roja_chat');
+  const savedHistory = localStorage.getItem('roja_history');
+  if(saved) {
+    chatBox.innerHTML = saved;
+    conversationHistory = JSON.parse(savedHistory||"[]");
+  } else appendBot("Halo, aku Roja AI 🤖. Ada yang bisa aku bantu hari ini?");
+  chatBox.scrollTop = chatBox.scrollHeight;
+};
 
 function appendUser(text) {
   const div = document.createElement("div");
@@ -144,7 +185,7 @@ function appendUser(text) {
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-function appendBot(text, isTyping=false) {
+function appendBot(text,isTyping=false) {
   const div = document.createElement("div");
   div.className = "message bot";
   if(isTyping) div.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
@@ -155,52 +196,47 @@ function appendBot(text, isTyping=false) {
   return div;
 }
 
-function copyText(btn, isCode=false) {
-  let text;
-  if (isCode) {
-    text = btn.parentElement.querySelector("pre code")?.innerText || "";
-  } else {
-    text = btn.parentElement.innerText.replace("Copy","").trim();
-  }
+function copyText(btn,isCode=false){
+  let text = isCode ? btn.parentElement.querySelector("pre code")?.innerText||"" : btn.parentElement.innerText.replace("Copy","").trim();
   navigator.clipboard.writeText(text);
   btn.textContent = "✅ Disalin";
   setTimeout(()=>btn.textContent="Copy",2000);
 }
 
-function saveChat() {
-  localStorage.setItem('roja_chat', chatBox.innerHTML);
-  localStorage.setItem('roja_history', JSON.stringify(conversationHistory));
+function saveChat(){
+  localStorage.setItem('roja_chat',chatBox.innerHTML);
+  localStorage.setItem('roja_history',JSON.stringify(conversationHistory));
 }
 
-function newChat() {
-  if (confirm("Mulai percakapan baru?")) {
-    if (conversationHistory.length > 0) {
-      let savedAllHistory = JSON.parse(localStorage.getItem('roja_all_history') || "[]");
+function newChat(){
+  if(confirm("Mulai percakapan baru?")){
+    if(conversationHistory.length>0){
+      let savedAllHistory = JSON.parse(localStorage.getItem('roja_all_history')||"[]");
       savedAllHistory.push([...conversationHistory]);
-      localStorage.setItem('roja_all_history', JSON.stringify(savedAllHistory));
+      localStorage.setItem('roja_all_history',JSON.stringify(savedAllHistory));
     }
-    chatBox.innerHTML = "";
-    conversationHistory = [];
+    chatBox.innerHTML="";
+    conversationHistory=[];
     appendBot("Percakapan baru dimulai. Halo, aku Roja AI 🤖");
     saveChat();
   }
 }
 
-function toggleFullscreen() {
-  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+function toggleFullscreen(){
+  if(!document.fullscreenElement) document.documentElement.requestFullscreen();
   else document.exitFullscreen();
 }
 
-input.addEventListener("keypress", e => { if (e.key==="Enter") sendMessage(); });
+input.addEventListener("keypress", e=>{if(e.key==="Enter") sendMessage();});
 
-openHistoryBtn.onclick = () => { chatHistoryPanel.style.right = "0"; renderHistory(); };
-function closeHistory() { chatHistoryPanel.style.right="-320px"; }
+openHistoryBtn.onclick = ()=>{ chatHistoryPanel.style.right="0"; renderHistory(); };
+function closeHistory(){ chatHistoryPanel.style.right="-320px"; }
 
-function renderHistory() {
+function renderHistory(){
   chatHistoryList.innerHTML="";
-  const allHistory = JSON.parse(localStorage.getItem('roja_all_history') || "[]");
-  if (allHistory.length===0) chatHistoryList.innerHTML='<li style="color:#aaa;">Belum ada percakapan sebelumnya.</li>';
-  else allHistory.forEach((conv, convIdx)=>{
+  const allHistory = JSON.parse(localStorage.getItem('roja_all_history')||"[]");
+  if(allHistory.length===0) chatHistoryList.innerHTML='<li style="color:#aaa;">Belum ada percakapan sebelumnya.</li>';
+  else allHistory.forEach((conv,convIdx)=>{
     const li=document.createElement('li');
     li.style.background="#1b214033";
     li.textContent=`[Percakapan ${convIdx+1}] ${conv.map(m=>m.content).join(" | ").substring(0,50)}${conv.map(m=>m.content).join(" ").length>50?"...":""}`;
@@ -209,7 +245,7 @@ function renderHistory() {
   });
 }
 
-function loadHistoryConversation(convIdx) {
+function loadHistoryConversation(convIdx){
   const allHistory=JSON.parse(localStorage.getItem('roja_all_history')||"[]");
   if(!allHistory[convIdx]) return;
   chatBox.innerHTML="";
