@@ -379,6 +379,34 @@
 
 </body>
 </html>
+turn;
+    }
+
+    allHistory.forEach((conv, convIdx) => {
+      const li = document.createElement('li');
+      li.style.background = "#1b214033";
+      li.textContent = `[Percakapan ${convIdx + 1}] ${conv.map(m=>m.content).join(" | ").substring(0,50)}${conv.map(m=>m.content).join(" ").length>50?"...":""}`;
+      li.onclick = () => loadHistoryConversation(convIdx);
+      chatHistoryList.appendChild(li);
+    });
+  }
+
+  function loadHistoryConversation(convIdx) {
+    const allHistory = JSON.parse(localStorage.getItem('roja_all_history') || "[]");
+    if (!allHistory[convIdx]) return;
+
+    chatBox.innerHTML = "";
+    conversationHistory = [...allHistory[convIdx]];
+    conversationHistory.forEach(msg => {
+      if (msg.role === "user") appendUser(msg.content);
+      else appendBot(msg.content);
+    });
+    closeHistory();
+  }
+</script>
+
+</body>
+</html>
 }${conv.map(m=>m.content).join(" ").length>50?"...":""}`;
       li.onclick = () => loadHistoryConversation(convIdx);
       chatHistoryList.appendChild(li);
