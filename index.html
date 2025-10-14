@@ -279,6 +279,13 @@
 
   function newChat() {
     if (confirm("Mulai percakapan baru?")) {
+      // Simpan percakapan lama ke riwayat
+      if (conversationHistory.length > 0) {
+        let savedAllHistory = JSON.parse(localStorage.getItem('roja_all_history') || "[]");
+        savedAllHistory.push([...conversationHistory]);
+        localStorage.setItem('roja_all_history', JSON.stringify(savedAllHistory));
+      }
+      // Mulai percakapan baru
       chatBox.innerHTML = "";
       conversationHistory = [];
       appendBot("Percakapan baru dimulai. Halo, aku Roja AI 🤖");
@@ -308,27 +315,29 @@
 
   function renderHistory() {
     chatHistoryList.innerHTML = "";
-    const savedHistory = JSON.parse(localStorage.getItem('roja_history') || "[]");
-    if (savedHistory.length === 0) {
-      chatHistoryList.innerHTML = '<li style="color:#aaa;">Belum ada percakapan.</li>';
+    const allHistory = JSON.parse(localStorage.getItem('roja_all_history') || "[]");
+    if (allHistory.length === 0) {
+      chatHistoryList.innerHTML = '<li style="color:#aaa;">Belum ada percakapan sebelumnya.</li>';
       return;
     }
-    savedHistory.forEach((msg, idx) => {
+
+    allHistory.forEach((conv, convIdx) => {
       const li = document.createElement('li');
-      li.style.background = msg.role==="user"?"#0078ff33":"#1b214033";
-      li.textContent = `[${msg.role}] ${msg.content.substring(0,50)}${msg.content.length>50?"...":""}`;
-      li.onclick = () => loadConversation(idx);
+      li.style.background = "#1b214033";
+      li.textContent = `[Percakapan ${convIdx + 1}] ${conv.map(m=>m.content).join(" | ").substring(0,50)}${conv.map(m=>m.content).join(" ").length>50?"...":""}`;
+      li.onclick = () => loadHistoryConversation(convIdx);
       chatHistoryList.appendChild(li);
     });
   }
 
-  function loadConversation(idx) {
-    const savedHistory = JSON.parse(localStorage.getItem('roja_history') || "[]");
-    if (!savedHistory[idx]) return;
+  function loadHistoryConversation(convIdx) {
+    const allHistory = JSON.parse(localStorage.getItem('roja_all_history') || "[]");
+    if (!allHistory[convIdx]) return;
+
     chatBox.innerHTML = "";
-    conversationHistory = savedHistory.slice(0, idx + 1);
+    conversationHistory = [...allHistory[convIdx]];
     conversationHistory.forEach(msg => {
-      if (msg.role==="user") appendUser(msg.content);
+      if (msg.role === "user") appendUser(msg.content);
       else appendBot(msg.content);
     });
     closeHistory();
