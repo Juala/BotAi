@@ -5,232 +5,333 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Roja AI Chat</title>
 <style>
+  * { box-sizing: border-box; }
+
   body {
-    background: linear-gradient(135deg, #0f172a, #1e293b, #0f172a);
-    color: white;
     font-family: 'Poppins', sans-serif;
     margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-
-  .chat-wrapper {
-    width: 100%;
-    max-width: 450px;
-    height: 90vh;
+    background: radial-gradient(circle at top left, #0a0f24, #020617);
+    color: #fff;
     display: flex;
     flex-direction: column;
-    background: rgba(30, 41, 59, 0.7);
-    border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-    backdrop-filter: blur(12px);
+    min-height: 100vh;
     overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.1);
   }
 
-  header {
-    text-align: center;
-    padding: 15px;
-    font-size: 18px;
-    font-weight: bold;
-    background: rgba(15, 23, 42, 0.9);
+  /* HEADER */
+  .chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    background: rgba(20, 26, 53, 0.85);
     border-bottom: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 10;
+  }
+
+  .chat-header-left {
+    display: flex;
+    align-items: center;
+  }
+
+  .chat-header img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+    box-shadow: 0 0 8px #0078ff80;
+  }
+
+  .chat-header h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
     color: #38bdf8;
   }
 
-  .chat-container {
+  .chat-header-right button {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #bbb;
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 8px;
+    padding: 6px 10px;
+    transition: 0.3s;
+  }
+
+  .chat-header-right button:hover {
+    background: #0078ff;
+    color: #fff;
+  }
+
+  /* CHAT BOX */
+  .chat-box {
     flex: 1;
     overflow-y: auto;
-    padding: 20px;
+    scroll-behavior: smooth;
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    scroll-behavior: smooth;
+    padding: 20px;
+    margin-top: 75px;
+    margin-bottom: 90px;
   }
 
-  .chat-message {
-    max-width: 80%;
-    padding: 12px 15px;
-    border-radius: 16px;
+  .message {
     position: relative;
+    margin: 10px 0;
+    max-width: 80%;
+    padding: 14px 16px;
+    border-radius: 14px;
+    line-height: 1.6;
     word-wrap: break-word;
-    line-height: 1.4;
-    animation: fadeIn 0.3s ease-in-out;
-  }
-
-  @keyframes fadeIn {
-    from {opacity: 0; transform: translateY(10px);}
-    to {opacity: 1; transform: translateY(0);}
+    animation: fadeIn 0.3s ease;
   }
 
   .user {
-    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    background: linear-gradient(135deg, #0078ff, #3b82f6);
     align-self: flex-end;
-    color: white;
+    border-bottom-right-radius: 0;
+    margin-right: 8px;
+    color: #fff;
+    box-shadow: 0 0 8px #0078ff80;
   }
 
   .bot {
     background: rgba(255,255,255,0.08);
     align-self: flex-start;
+    border-bottom-left-radius: 0;
+    margin-left: 8px;
     border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .bot pre, .bot code {
+    background: rgba(255,255,255,0.05);
+    display: block;
+    padding: 8px;
+    border-radius: 6px;
+    margin: 5px 0;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: #38bdf8;
+    overflow-x: auto;
   }
 
   .copy-btn {
     position: absolute;
     bottom: 5px;
-    right: 8px;
-    font-size: 12px;
+    right: 10px;
+    font-size: 13px;
     background: none;
     border: none;
     color: #38bdf8;
     cursor: pointer;
-    opacity: 0.6;
+    opacity: 0.7;
   }
 
-  .copy-btn:hover {
-    opacity: 1;
+  .copy-btn:hover { opacity: 1; color: #60a5fa; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
-  .input-container {
+  /* INPUT AREA */
+  .chat-input {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
     display: flex;
     padding: 12px;
-    background: rgba(15,23,42,0.9);
+    background: rgba(20, 26, 53, 0.85);
     border-top: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    z-index: 20;
   }
 
-  input {
+  .chat-input input {
     flex: 1;
-    padding: 12px;
+    padding: 12px 14px;
     border: none;
-    border-radius: 12px;
-    background: rgba(255,255,255,0.1);
-    color: white;
+    border-radius: 10px;
+    font-size: 15px;
     outline: none;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
   }
 
-  input::placeholder {
-    color: #94a3b8;
-  }
-
-  button {
-    background: linear-gradient(135deg, #16a34a, #22c55e);
-    color: white;
+  .chat-input button {
+    background: linear-gradient(135deg, #0078ff, #00c6ff);
+    color: #fff;
     border: none;
-    border-radius: 12px;
-    margin-left: 10px;
     padding: 12px 18px;
+    margin-left: 10px;
+    border-radius: 10px;
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 600;
     transition: 0.2s;
+    box-shadow: 0 0 10px #0078ff80;
   }
 
-  button:hover {
-    background: linear-gradient(135deg, #22c55e, #16a34a);
+  .chat-input button:hover {
     transform: scale(1.05);
   }
 
-  footer {
+  /* FOOTER */
+  .footer {
     text-align: center;
-    padding: 10px;
+    padding: 8px;
     font-size: 12px;
-    color: #94a3b8;
-    background: rgba(15,23,42,0.9);
-    border-top: 1px solid rgba(255,255,255,0.1);
+    color: #aaa;
+    font-style: italic;
+    position: fixed;
+    bottom: 65px;
+    left: 0;
+    right: 0;
+    background: transparent;
   }
 </style>
 </head>
 <body>
 
-<div class="chat-wrapper">
-  <header>🤖 Roja AI Chat</header>
-
-  <div class="chat-container" id="chatContainer">
-    <div class="bot chat-message">Halo 👋, saya <b>Roja AI</b>. Ada yang bisa saya bantu hari ini?</div>
+  <div class="chat-header">
+    <div class="chat-header-left">
+      <img src="roja-avatar.png" alt="Roja AI Avatar">
+      <h2>Roja AI</h2>
+    </div>
+    <div class="chat-header-right">
+      <button onclick="newChat()">🗘 Percakapan Baru</button>
+      <button onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    </div>
   </div>
 
-  <div class="input-container">
-    <input type="text" id="userInput" placeholder="Ketik pesanmu..." />
+  <div class="chat-box" id="chatBox"></div>
+
+  <div class="chat-input">
+    <input id="userInput" type="text" placeholder="Ketik pesan..." />
     <button onclick="sendMessage()">Kirim</button>
   </div>
 
-  <footer>© 2025 RojaServer | Modern Chat v3</footer>
-</div>
+  <div class="footer">© copyright@RojaServer | V3</div>
 
 <script>
-  let conversation = [
-    { role: "system", content: "Kamu adalah Roja AI, asisten cerdas yang ramah dan komunikatif dalam Bahasa Indonesia." }
-  ];
+  const chatBox = document.getElementById('chatBox');
+  const input = document.getElementById('userInput');
+  const GEMINI_API_KEY = "AIzaSyC310duBltZgbkMMfqRoAn6qVELo7x2slI"; 
+  const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+
+  let conversationHistory = [];
+
+  window.onload = function() {
+    const saved = localStorage.getItem('roja_chat');
+    const savedHistory = localStorage.getItem('roja_history');
+    if (saved) {
+      chatBox.innerHTML = saved;
+      conversationHistory = JSON.parse(savedHistory || "[]");
+    } else {
+      appendBot("Halo, aku <b>Roja AI</b> 🤖<br>Ada yang bisa aku bantu hari ini?");
+    }
+    chatBox.scrollTop = chatBox.scrollHeight;
+  };
 
   async function sendMessage() {
-    const input = document.getElementById("userInput");
-    const message = input.value.trim();
-    if (!message) return;
+    const msg = input.value.trim();
+    if (!msg) return;
 
-    addMessage(message, "user");
+    appendUser(msg);
     input.value = "";
-    conversation.push({ role: "user", content: message });
+    appendBot("<i>⏳ Roja AI sedang mengetik...</i>");
 
-    const reply = await getAIResponse(conversation);
-    addMessage(reply, "bot");
-    conversation.push({ role: "assistant", content: reply });
-  }
-
-  function addMessage(text, sender) {
-    const container = document.getElementById("chatContainer");
-    const msg = document.createElement("div");
-    msg.classList.add("chat-message", sender);
-    msg.innerHTML = `<div class="message-text"></div>
-                     <button class="copy-btn" onclick="copyText(this)">📋</button>`;
-    container.appendChild(msg);
-    container.scrollTop = container.scrollHeight;
-
-    typeWriter(msg.querySelector(".message-text"), text);
-  }
-
-  function typeWriter(element, text) {
-    let i = 0;
-    const speed = 25;
-    function typing() {
-      if (i < text.length) {
-        element.innerHTML += text.charAt(i);
-        i++;
-        setTimeout(typing, speed);
-      }
-    }
-    typing();
-  }
-
-  function copyText(btn) {
-    const text = btn.parentElement.querySelector(".message-text").innerText;
-    navigator.clipboard.writeText(text);
-    btn.innerText = "✅";
-    setTimeout(() => (btn.innerText = "📋"), 1500);
-  }
-
-  async function getAIResponse(history) {
-    const apiKey = "AIzaSyC310duBltZgbkMMfqRoAn6qVELo7x2slI"; // Ganti dengan API key kamu
+    conversationHistory.push({ role: "user", content: msg });
 
     try {
-      const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + apiKey, {
+      const prompt = conversationHistory.map(m => `${m.role}: ${m.content}`).join("\n");
+
+      const res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: history.map(msg => ({
-            role: msg.role,
-            parts: [{ text: msg.content }]
-          }))
+          contents: [{ parts: [{ text: prompt }] }]
         })
       });
 
       const data = await res.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, aku tidak dapat memahami pesanmu 😅";
-    } catch (e) {
-      return "⚠️ Terjadi kesalahan koneksi ke API.";
+      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Tidak ada respons dari AI.";
+
+      chatBox.lastElementChild.innerHTML = formatText(reply) + `<button class="copy-btn" onclick="copyText(this)">📋</button>`;
+      conversationHistory.push({ role: "model", content: reply });
+
+    } catch (err) {
+      console.error(err);
+      chatBox.lastElementChild.textContent = "❌ Gagal menghubungi API Gemini.";
+    }
+
+    saveChat();
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function appendUser(text) {
+    const div = document.createElement("div");
+    div.className = "message user";
+    div.textContent = text;
+    chatBox.appendChild(div);
+    saveChat();
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function appendBot(text) {
+    const div = document.createElement("div");
+    div.className = "message bot";
+    div.innerHTML = text;
+    chatBox.appendChild(div);
+    saveChat();
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function formatText(text) {
+    return text
+      .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>") // bold
+      .replace(/\*(.*?)\*/g, "<i>$1</i>") // italic
+      .replace(/`([^`]+)`/g, "<code>$1</code>") // inline code
+      .replace(/```([^`]+)```/gs, "<pre>$1</pre>") // code block
+      .replace(/\n/g, "<br>"); // line break
+  }
+
+  function copyText(btn) {
+    const text = btn.parentElement.innerText;
+    navigator.clipboard.writeText(text);
+    btn.textContent = "✅";
+    setTimeout(() => btn.textContent = "📋", 1500);
+  }
+
+  function saveChat() {
+    localStorage.setItem('roja_chat', chatBox.innerHTML);
+    localStorage.setItem('roja_history', JSON.stringify(conversationHistory));
+  }
+
+  function newChat() {
+    if (confirm("Mulai percakapan baru?")) {
+      chatBox.innerHTML = "";
+      conversationHistory = [];
+      appendBot("Percakapan baru dimulai. Halo, aku <b>Roja AI</b> 🤖");
+      saveChat();
     }
   }
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  }
+
+  input.addEventListener("keypress", function(e) {
+    if (e.key === "Enter") sendMessage();
+  });
 </script>
 
 </body>
