@@ -39,23 +39,30 @@
     padding: 15px;
     overflow-y: auto;
     scroll-behavior: smooth;
+    display: flex;
+    flex-direction: column;
   }
   .message {
-    margin: 10px 0;
+    margin: 8px 0;
     max-width: 75%;
     padding: 12px 16px;
     border-radius: 12px;
     line-height: 1.5;
+    word-wrap: break-word;
   }
   .user {
     background: #0078ff;
     align-self: flex-end;
     border-bottom-right-radius: 0;
+    margin-right: 5px;
+    margin-top: 4px;
   }
   .bot {
     background: #232a48;
     align-self: flex-start;
     border-bottom-left-radius: 0;
+    margin-left: 5px;
+    margin-top: 8px;
   }
   .chat-input {
     display: flex;
@@ -107,10 +114,11 @@
   }
   .footer {
     text-align: center;
-    padding: 8px;
+    padding: 10px;
     background: #0a0f24;
     font-size: 12px;
-    color: #777;
+    color: #aaa;
+    font-style: italic;
   }
 </style>
 </head>
@@ -134,14 +142,14 @@
   </div>
 
   <div class="footer">
-    Copyright © RojaServer | Roja AI v2
+    copyright@RojaServer | V2
   </div>
 
 <script>
   const chatBox = document.getElementById('chatBox');
   const input = document.getElementById('userInput');
 
-  // === Load chat dari localStorage saat awal ===
+  // === Load chat dari localStorage ===
   window.onload = function() {
     const saved = localStorage.getItem('roja_chat');
     if (saved) {
@@ -161,7 +169,7 @@
     setTimeout(() => appendBot(generateResponse(msg)), 600);
   }
 
-  // === Tambahkan pesan ke chatbox ===
+  // === Pesan user ===
   function appendUser(text) {
     const div = document.createElement("div");
     div.className = "message user";
@@ -171,6 +179,7 @@
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 
+  // === Pesan bot ===
   function appendBot(text) {
     const div = document.createElement("div");
     div.className = "message bot";
@@ -180,7 +189,7 @@
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 
-  // === Fungsi dummy respons AI ===
+  // === Contoh respons bot sederhana ===
   function generateResponse(msg) {
     msg = msg.toLowerCase();
     if (msg.includes("halo")) return "Hai juga! Apa kabar hari ini?";
@@ -189,30 +198,30 @@
     return "Aku masih belajar memahami itu. Bisa dijelaskan lebih detail?";
   }
 
-  // === Auto-save ke localStorage ===
+  // === Auto save chat ===
   function saveChat() {
     localStorage.setItem('roja_chat', chatBox.innerHTML);
   }
 
-  // === Mulai percakapan baru ===
+  // === Chat baru ===
   function newChat() {
-    if (confirm("Hapus percakapan lama dan mulai baru?")) {
+    if (confirm("Mulai percakapan baru?")) {
       chatBox.innerHTML = "";
-      appendBot("Percakapan baru dimulai. Halo! Aku Roja AI 🤖");
+      appendBot("Percakapan baru dimulai. Halo, aku Roja AI 🤖");
       saveChat();
     }
   }
 
-  // === Fullscreen mode ===
+  // === Fullscreen ===
   function toggleFullscreen() {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen();
     } else {
-      if (document.exitFullscreen) document.exitFullscreen();
+      document.exitFullscreen();
     }
   }
 
-  // === Enter untuk kirim pesan ===
+  // === Enter untuk kirim ===
   input.addEventListener("keypress", function(e) {
     if (e.key === "Enter") sendMessage();
   });
