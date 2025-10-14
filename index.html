@@ -1,192 +1,266 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Roja AI Chat</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roja AI Chat</title>
+<style>
+  * { box-sizing: border-box; }
 
-    body {
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      background-color: #0a0f24;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      overflow: hidden;
-    }
+  body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    background-color: #0a0f24;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow: hidden;
+  }
 
-    header {
-      background: linear-gradient(90deg, #141a35, #0f1330);
-      padding: 15px;
-      text-align: center;
-      font-weight: bold;
-      font-size: 18px;
-      border-bottom: 1px solid #222;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 10;
-    }
+  .chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    background: #141a35;
+    border-bottom: 1px solid #2a2f4a;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+  }
 
-    .chat-container {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      margin-top: 60px;
-      margin-bottom: 70px;
-      overflow-y: auto;
-      scroll-behavior: smooth;
-      padding: 10px 15px;
-    }
+  .chat-header-left {
+    display: flex;
+    align-items: center;
+  }
 
-    .chat-message {
-      margin-bottom: 10px;
-      display: flex;
-      align-items: flex-start;
-    }
+  .chat-header img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+  }
 
-    .bot {
-      justify-content: flex-start;
-    }
+  .chat-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+  }
 
-    .user {
-      justify-content: flex-end;
-    }
+  .chat-header-right {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
 
-    .message {
-      padding: 10px 15px;
-      border-radius: 15px;
-      max-width: 80%;
-      word-wrap: break-word;
-      font-size: 14px;
-    }
+  .chat-header-right button {
+    background: none;
+    border: none;
+    color: #bbb;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
 
-    .bot .message {
-      background: #141a35;
-      border: 1px solid #1f275a;
-    }
+  .chat-header-right button:hover {
+    color: #0078ff;
+  }
 
-    .user .message {
-      background: #007bff;
-      border: 1px solid #007bff;
-    }
+  .chat-box {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    display: flex;
+    flex-direction: column;
+    margin-top: 75px; /* biar tidak ketutup header */
+    margin-bottom: 90px; /* biar tidak ketutup input */
+  }
 
-    .chat-input {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      display: flex;
-      padding: 10px;
-      background: #141a35;
-      border-top: 1px solid #1f275a;
-    }
+  .message {
+    margin: 8px 0;
+    max-width: 75%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    line-height: 1.5;
+    word-wrap: break-word;
+  }
 
-    .chat-input input {
-      flex: 1;
-      padding: 10px;
-      border-radius: 10px;
-      border: none;
-      outline: none;
-      font-size: 14px;
-      background: #0a0f24;
-      color: #fff;
-    }
+  .user {
+    background: #0078ff;
+    align-self: flex-end;
+    border-bottom-right-radius: 0;
+    margin-right: 5px;
+  }
 
-    .chat-input button {
-      background: #007bff;
-      border: none;
-      padding: 10px 15px;
-      margin-left: 8px;
-      border-radius: 10px;
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-    }
+  .bot {
+    background: #232a48;
+    align-self: flex-start;
+    border-bottom-left-radius: 0;
+    margin-left: 5px;
+  }
 
-    .chat-input button:hover {
-      background: #0056b3;
-    }
+  .chat-input {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    padding: 12px;
+    background: #141a35;
+    border-top: 1px solid #2a2f4a;
+    z-index: 20;
+  }
 
-    footer {
-      text-align: center;
-      font-size: 12px;
-      color: #aaa;
-      padding: 8px 0;
-      position: fixed;
-      bottom: 45px;
-      left: 0;
-      right: 0;
-      background: transparent;
-    }
-  </style>
+  .chat-input input {
+    flex: 1;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    background: #1f2745;
+    color: #fff;
+  }
+
+  .chat-input button {
+    background: #0078ff;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    margin-left: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  .chat-input button:hover {
+    background: #0060d4;
+  }
+
+  .footer {
+    text-align: center;
+    padding: 8px;
+    font-size: 12px;
+    color: #aaa;
+    font-style: italic;
+    position: fixed;
+    bottom: 55px; /* di atas input */
+    left: 0;
+    right: 0;
+    background: transparent;
+  }
+</style>
 </head>
 <body>
-  <header>🤖 Roja AI</header>
 
-  <div class="chat-container" id="chatContainer">
-    <div class="chat-message bot">
-      <div class="message">Halo! Aku Roja AI 🤖. Ada yang bisa aku bantu hari ini?</div>
+  <div class="chat-header">
+    <div class="chat-header-left">
+      <img src="roja-avatar.png" alt="Roja AI Avatar">
+      <h2>Roja AI</h2>
+    </div>
+    <div class="chat-header-right">
+      <button onclick="newChat()">percakapan baru</button>
+      <button onclick="toggleFullscreen()">fullscreen</button>
     </div>
   </div>
 
+  <div class="chat-box" id="chatBox"></div>
+
   <div class="chat-input">
-    <input id="userInput" type="text" placeholder="Ketik pesanmu..." />
+    <input id="userInput" type="text" placeholder="Ketik pesan..." />
     <button onclick="sendMessage()">Kirim</button>
   </div>
 
-  <footer>copyright@RojaServer | V2</footer>
+  <div class="footer">
+    copyright@RojaServer | V2
+  </div>
 
-  <script>
-    const chatContainer = document.getElementById("chatContainer");
-    const userInput = document.getElementById("userInput");
+<script>
+  const chatBox = document.getElementById('chatBox');
+  const input = document.getElementById('userInput');
 
-    function appendMessage(sender, text) {
-      const messageElement = document.createElement("div");
-      messageElement.classList.add("chat-message", sender);
-
-      const bubble = document.createElement("div");
-      bubble.classList.add("message");
-      bubble.innerText = text;
-
-      messageElement.appendChild(bubble);
-      chatContainer.appendChild(messageElement);
-      chatContainer.scrollTop = chatContainer.scrollHeight;
+  // === Load chat dari localStorage ===
+  window.onload = function() {
+    const saved = localStorage.getItem('roja_chat');
+    if (saved) {
+      chatBox.innerHTML = saved;
+      chatBox.scrollTop = chatBox.scrollHeight;
+    } else {
+      appendBot("Halo, aku Roja AI. Ada yang bisa aku bantu?");
     }
+  };
 
-    async function sendMessage() {
-      const text = userInput.value.trim();
-      if (!text) return;
+  // === Kirim pesan ===
+  function sendMessage() {
+    const msg = input.value.trim();
+    if (!msg) return;
+    appendUser(msg);
+    input.value = "";
+    setTimeout(() => appendBot(generateResponse(msg)), 600);
+  }
 
-      appendMessage("user", text);
-      userInput.value = "";
+  // === Tambah pesan user ===
+  function appendUser(text) {
+    const div = document.createElement("div");
+    div.className = "message user";
+    div.textContent = text;
+    chatBox.appendChild(div);
+    saveChat();
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
 
-      // loading animasi
-      const loading = document.createElement("div");
-      loading.classList.add("chat-message", "bot");
-      const bubble = document.createElement("div");
-      bubble.classList.add("message");
-      bubble.innerText = "Mengetik...";
-      loading.appendChild(bubble);
-      chatContainer.appendChild(loading);
-      chatContainer.scrollTop = chatContainer.scrollHeight;
+  // === Tambah pesan bot ===
+  function appendBot(text) {
+    const div = document.createElement("div");
+    div.className = "message bot";
+    div.textContent = text;
+    chatBox.appendChild(div);
+    saveChat();
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
 
-      // simulasi balasan AI
-      setTimeout(() => {
-        chatContainer.removeChild(loading);
-        appendMessage("bot", "Ini respons dari Roja AI untuk: " + text);
-      }, 1000);
+  // === Respon otomatis sederhana ===
+  function generateResponse(msg) {
+    msg = msg.toLowerCase();
+    if (msg.includes("halo")) return "Hai juga! Apa kabar hari ini?";
+    if (msg.includes("siapa kamu")) return "Aku Roja AI, asisten virtual buatan RojaServer 😎";
+    if (msg.includes("terima kasih")) return "Sama-sama! Senang bisa membantu.";
+    return "Aku masih belajar memahami itu. Bisa dijelaskan lebih detail?";
+  }
+
+  // === Auto save chat ===
+  function saveChat() {
+    localStorage.setItem('roja_chat', chatBox.innerHTML);
+  }
+
+  // === Percakapan baru ===
+  function newChat() {
+    if (confirm("Mulai percakapan baru?")) {
+      chatBox.innerHTML = "";
+      appendBot("Percakapan baru dimulai. Halo, aku Roja AI 🤖");
+      saveChat();
     }
+  }
 
-    userInput.addEventListener("keypress", function (e) {
-      if (e.key === "Enter") sendMessage();
-    });
-  </script>
+  // === Fullscreen ===
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  }
+
+  // === Tekan Enter untuk kirim ===
+  input.addEventListener("keypress", function(e) {
+    if (e.key === "Enter") sendMessage();
+  });
+</script>
+
 </body>
 </html>
