@@ -1,321 +1,269 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Roja AI Chat</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roja AI Chat</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/lucide@latest"></script>
+    body {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #fff;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
 
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #0f172a, #1e293b);
-    color: #fff;
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+    header {
+      background: rgba(30, 41, 59, 0.95);
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+      backdrop-filter: blur(10px);
+    }
 
-  /* === LOGIN PAGE === */
-  #loginPage {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 16px;
-    padding: 30px 25px;
-    width: 90%;
-    max-width: 350px;
-    text-align: center;
-    box-shadow: 0 0 20px rgba(0,0,0,0.4);
-    backdrop-filter: blur(10px);
-  }
-  #loginPage h2 {
-    margin-bottom: 20px;
-    font-weight: 600;
-    font-size: 1.3rem;
-  }
-  #loginPage input {
-    width: 100%;
-    padding: 10px;
-    border: none;
-    border-radius: 8px;
-    background: rgba(255,255,255,0.1);
-    color: #fff;
-    font-size: 1rem;
-    margin-bottom: 12px;
-    outline: none;
-  }
-  #loginPage button {
-    width: 100%;
-    background: #3b82f6;
-    border: none;
-    border-radius: 8px;
-    padding: 10px;
-    color: #fff;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.3s;
-  }
-  #loginPage button:hover {
-    background: #2563eb;
-  }
-  .guest {
-    background: transparent;
-    border: 1px solid #3b82f6;
-    color: #3b82f6;
-    margin-top: 10px;
-  }
-  .guest:hover {
-    background: #3b82f6;
-    color: white;
-  }
+    header h1 {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
 
-  /* === CHAT PAGE === */
-  #chatPage {
-    display: none;
-    flex-direction: column;
-    height: 100vh;
-    width: 100%;
-  }
+    header button {
+      background: #2563eb;
+      border: none;
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
 
-  header {
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(10px);
-    padding: 10px 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 600;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-  }
-  #userName {
-    font-size: 0.9rem;
-    opacity: 0.8;
-  }
+    header button:hover {
+      background: #1d4ed8;
+    }
 
-  #chatBox {
-    flex: 1;
-    overflow-y: auto;
-    padding: 15px;
-    scroll-behavior: smooth;
-    display: flex;
-    flex-direction: column;
-  }
+    .chat-box {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      scroll-behavior: smooth;
+      margin-bottom: 85px;
+    }
 
-  .message {
-    max-width: 80%;
-    padding: 10px 15px;
-    border-radius: 12px;
-    margin-bottom: 10px;
-    position: relative;
-  }
+    .message {
+      margin: 10px 0;
+      padding: 12px 16px;
+      border-radius: 12px;
+      max-width: 80%;
+      line-height: 1.5;
+      word-wrap: break-word;
+      position: relative;
+    }
 
-  .user {
-    background: #2563eb;
-    align-self: flex-end;
-    border-bottom-right-radius: 0;
-  }
+    .user {
+      background: #2563eb;
+      align-self: flex-end;
+      margin-left: auto;
+      border-bottom-right-radius: 4px;
+    }
 
-  .bot {
-    background: rgba(255,255,255,0.1);
-    align-self: flex-start;
-    border-bottom-left-radius: 0;
-  }
+    .bot {
+      background: #334155;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
 
-  footer {
-    display: flex;
-    padding: 10px;
-    background: rgba(0,0,0,0.4);
-    border-top: 1px solid rgba(255,255,255,0.1);
-  }
+    .message .copy-btn {
+      position: absolute;
+      bottom: 5px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: #cbd5e1;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
 
-  input {
-    flex: 1;
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-    outline: none;
-    background: rgba(255,255,255,0.1);
-    color: #fff;
-  }
+    .chat-input {
+      display: flex;
+      padding: 12px;
+      background: rgba(30, 41, 59, 0.95);
+      border-top: 1px solid #334155;
+      position: fixed;
+      bottom: 10px;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      border-radius: 12px 12px 0 0;
+      box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+    }
 
-  button {
-    background: #3b82f6;
-    border: none;
-    border-radius: 8px;
-    margin-left: 10px;
-    padding: 0 15px;
-    cursor: pointer;
-    transition: 0.3s;
-    color: white;
-    font-weight: 600;
-  }
+    .chat-input input {
+      flex: 1;
+      background: #1e293b;
+      border: none;
+      color: #fff;
+      padding: 12px;
+      border-radius: 8px;
+      outline: none;
+      font-size: 15px;
+    }
 
-  button:hover {
-    background: #2563eb;
-  }
+    .chat-input button {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      padding: 12px 16px;
+      margin-left: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
 
-  .copy-btn {
-    position: absolute;
-    right: 8px;
-    top: 8px;
-    background: rgba(255,255,255,0.1);
-    border: none;
-    color: #ccc;
-    cursor: pointer;
-    font-size: 0.8rem;
-    border-radius: 5px;
-    padding: 2px 6px;
-  }
+    .chat-input button:hover {
+      background: #1d4ed8;
+    }
 
-  small {
-    text-align: center;
-    color: #aaa;
-    font-size: 0.8rem;
-    padding: 5px;
-  }
-</style>
+    .watermark {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #64748b;
+      position: fixed;
+      bottom: 2px;
+      left: 0;
+      right: 0;
+    }
+
+    .login-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    .login-container input {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      width: 80%;
+      max-width: 300px;
+    }
+
+    .login-container button {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      margin-top: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .login-container button:hover {
+      background: #1d4ed8;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- LOGIN PAGE -->
-  <div id="loginPage">
-    <h2>🔐 Masuk ke Roja AI</h2>
-    <input id="emailInput" type="email" placeholder="Masukkan email kamu..." />
+  <div id="login" class="login-container">
+    <h1>Selamat Datang di Roja AI 🤖</h1>
+    <input type="text" id="username" placeholder="Masukkan nama Anda">
     <button onclick="login()">Masuk</button>
-    <button class="guest" onclick="guestMode()">Masuk sebagai Guest</button>
+    <button onclick="guestLogin()">Masuk Sebagai Tamu</button>
   </div>
 
-  <!-- CHAT PAGE -->
-  <div id="chatPage">
+  <div id="chatApp" style="display:none;">
     <header>
-      <div>🤖 Roja AI Chat</div>
-      <div id="userName"></div>
-      <button onclick="logout()">Keluar</button>
+      <h1>Roja AI Chat</h1>
+      <div>
+        <button onclick="toggleFullscreen()">⛶</button>
+        <button onclick="newChat()">🗘 Baru</button>
+      </div>
     </header>
 
-    <div id="chatBox"></div>
+    <div class="chat-box" id="chatBox"></div>
 
-    <footer>
-      <input id="userInput" type="text" placeholder="Ketik pesan..." />
-      <button onclick="sendMessage()"><i data-lucide="send"></i></button>
-    </footer>
+    <div class="chat-input">
+      <input type="text" id="userInput" placeholder="Ketik pesan..." onkeydown="if(event.key==='Enter') sendMessage()">
+      <button onclick="sendMessage()">Kirim</button>
+    </div>
 
-    <small>© 2025 RojaServer | V2</small>
+    <div class="watermark">© 2025 RojaServer | V2</div>
   </div>
 
-<script>
-  lucide.createIcons();
-  const chatBox = document.getElementById('chatBox');
-  const input = document.getElementById('userInput');
-  const loginPage = document.getElementById('loginPage');
-  const chatPage = document.getElementById('chatPage');
-  const userName = document.getElementById('userName');
+  <script>
+    let username = "";
+    const chatBox = document.getElementById("chatBox");
 
-  let currentUser = localStorage.getItem("roja_user");
-
-  // === CEK LOGIN ===
-  window.onload = () => {
-    if (currentUser) {
-      openChat(currentUser);
+    function login() {
+      const name = document.getElementById("username").value.trim();
+      if (!name) return alert("Masukkan nama terlebih dahulu!");
+      username = name;
+      document.getElementById("login").style.display = "none";
+      document.getElementById("chatApp").style.display = "flex";
     }
-  };
 
-  function login() {
-    const email = document.getElementById("emailInput").value.trim();
-    if (!email) return alert("Masukkan email terlebih dahulu!");
-    localStorage.setItem("roja_user", email);
-    openChat(email);
-  }
-
-  function guestMode() {
-    const guestId = "Guest_" + Math.floor(Math.random() * 9999);
-    localStorage.setItem("roja_user", guestId);
-    openChat(guestId);
-  }
-
-  function logout() {
-    if (confirm("Yakin mau keluar?")) {
-      localStorage.removeItem("roja_user");
-      localStorage.removeItem(`roja_chat_${currentUser}`);
-      location.reload();
+    function guestLogin() {
+      username = "Guest";
+      document.getElementById("login").style.display = "none";
+      document.getElementById("chatApp").style.display = "flex";
     }
-  }
 
-  // === BUKA CHAT ===
-  function openChat(user) {
-    currentUser = user;
-    userName.textContent = `👤 ${user}`;
-    loginPage.style.display = "none";
-    chatPage.style.display = "flex";
+    function newChat() {
+      chatBox.innerHTML = "";
+    }
 
-    const saved = localStorage.getItem(`roja_chat_${user}`);
-    if (saved) chatBox.innerHTML = saved;
-    else appendBot("Halo " + user + "! Aku Roja AI 🤖 Siap membantu kamu hari ini!");
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    }
 
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
+    function sendMessage() {
+      const input = document.getElementById("userInput");
+      const message = input.value.trim();
+      if (!message) return;
+      appendMessage("user", message);
+      input.value = "";
+      input.focus();
 
-  // === SIMPAN CHAT ===
-  function saveChat() {
-    localStorage.setItem(`roja_chat_${currentUser}`, chatBox.innerHTML);
-  }
+      // fake bot reply
+      setTimeout(() => {
+        appendMessage("bot", `Halo ${username}, kamu berkata: "${message}".`);
+      }, 500);
+    }
 
-  // === KIRIM PESAN ===
-  function sendMessage() {
-    const msg = input.value.trim();
-    if (!msg) return;
-    appendUser(msg);
-    input.value = "";
-    fakeBotResponse(msg);
-  }
+    function appendMessage(sender, text) {
+      const msg = document.createElement("div");
+      msg.className = "message " + sender;
+      msg.innerHTML = text + `<button class="copy-btn" onclick="copyMessage(this)">📋</button>`;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
 
-  function appendUser(text) {
-    const div = document.createElement("div");
-    div.className = "message user";
-    div.innerText = text;
-    chatBox.appendChild(div);
-    saveChat();
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
+    function copyMessage(btn) {
+      const text = btn.parentElement.textContent.trim();
+      navigator.clipboard.writeText(text);
+      btn.textContent = "✅";
+      setTimeout(() => (btn.textContent = "📋"), 1500);
+    }
+  </script>
 
-  function appendBot(text) {
-    const div = document.createElement("div");
-    div.className = "message bot";
-    div.innerHTML = text.replace(/\n/g, "<br>");
-
-    const copyBtn = document.createElement("button");
-    copyBtn.className = "copy-btn";
-    copyBtn.innerText = "Copy";
-    copyBtn.onclick = () => {
-      navigator.clipboard.writeText(div.innerText);
-      copyBtn.innerText = "Copied!";
-      setTimeout(() => copyBtn.innerText = "Copy", 1500);
-    };
-    div.appendChild(copyBtn);
-
-    chatBox.appendChild(div);
-    saveChat();
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-
-  // === SIMULASI AI ===
-  function fakeBotResponse(msg) {
-    const botMsg = document.createElement("div");
-    botMsg.className = "message bot";
-    botMsg.innerText = "⏳ Roja AI sedang mengetik...";
-    chatBox.appendChild(botMsg);
-    chatBox.scrollTop = chatBox.scrollHeight;
-
-    setTimeout(() => {
-      botMsg.remove();
-      appendBot(`Halo ${currentUser}, kamu menanyakan: <b>${msg}</b><br><br>Roja AI akan segera menambah fitur baru yang lebih keren! ⚡`);
-    }, 900);
-  }
-</script>
 </body>
 </html>
