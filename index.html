@@ -82,13 +82,6 @@ const chatHistoryPanel = document.getElementById('chatHistoryPanel');
 const chatHistoryList = document.getElementById('chatHistoryList');
 const openHistoryBtn = document.getElementById('openHistoryBtn');
 
-// API keys & URLs
-const AI_SERVICES = {
-  openai: { keys:["YOUR_OPENAI_KEY1","YOUR_OPENAI_KEY2"], url:"https://api.openai.com/v1/chat/completions" },
-  huggingface: { keys:["YOUR_HF_KEY1","YOUR_HF_KEY2"], url:"https://api-inference.huggingface.co/models" },
-  gemini: { keys:["YOUR_GEMINI_KEY1","YOUR_GEMINI_KEY2"], url:"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent" }
-};
-
 let conversationHistory = [];
 
 window.onload = function(){
@@ -178,53 +171,7 @@ function loadHistoryConversation(convIdx){
   closeHistory();
 }
 
-// Helper: pilih service acak & API key acak
-function selectService(msg){
-  if(/gambar|image|photo/i.test(msg)) return "huggingface";
-  else if(/buatkan kode|html|css|javascript|js|php|python/i.test(msg)) return "openai";
-  else return "gemini";
-}
-function getRandomKey(service){ const keys=AI_SERVICES[service].keys; return keys[Math.floor(Math.random()*keys.length)]; }
-
-// Core: panggil AI & support gambar
-async function callAI(msg){
-  const service=selectService(msg);
-  const key=getRandomKey(service);
-  let reply=""; let isImage=false;
-
-  if(service==="openai"){
-    const res=await fetch(AI_SERVICES[service].url,{
-      method:"POST",
-      headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${key}` },
-      body: JSON.stringify({ model:"gpt-3.5-turbo", messages:conversationHistory.map(m=>({role:m.role==="user"?"user":"assistant",content:m.content})) })
-    });
-    const data=await res.json();
-    reply=data.choices?.[0]?.message?.content || "⚠️ Tidak ada respons";
-  } else if(service==="huggingface"){
-    const model=/gambar|image|photo/i.test(msg) ? "CompVis/stable-diffusion-v1-4" : "gpt2";
-    const res=await fetch(`https://api-inference.huggingface.co/models/${model}`,{
-      method:"POST",
-      headers:{ "Authorization":`Bearer ${key}`, "Content-Type":"application/json" },
-      body: JSON.stringify({ inputs: msg })
-    });
-    const data=await res.json();
-    if(data?.data?.[0]?.image || data?.generated_image){
-      reply=data.data[0].image || data.generated_image;
-      isImage=true;
-    } else reply=data.generated_text || "⚠️ Tidak ada respons";
-  } else if(service==="gemini"){
-    const res=await fetch(`${AI_SERVICES[service].url}?key=${key}`,{
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ contents:[{ parts:[{ text: msg }] }] })
-    });
-    const data=await res.json();
-    reply=data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Tidak ada respons";
-  }
-  return { reply, isImage };
-}
-
-// Send Message
+// Kirim pesan ke serverless function API di Vercel
 async function sendMessage(){
   const msg=input.value.trim();
   if(!msg) return;
@@ -234,16 +181,21 @@ async function sendMessage(){
   conversationHistory.push({ role:"user", content:msg });
 
   try{
-    const {reply,isImage}=await callAI(msg);
-    if(isImage){
-      typingDiv.innerHTML=`<img src="data:image/png;base64,${reply}" style="max-width:100%;border-radius:12px;" />`;
+    const res = await fetch('/api/ai', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ message: msg, history: conversationHistory })
+    });
+    const data = await res.json();
+    if(data.isImage){
+      typingDiv.innerHTML=`<img src="data:image/png;base64,${data.reply}" style="max-width:100%;border-radius:12px;" />`;
     } else {
       const isCodeRequest=/buatkan kode|html|css|javascript|js|php|python/i.test(msg);
       typingDiv.innerHTML=isCodeRequest
-        ? `<pre><code>${reply.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</code></pre><button class="copy-btn" onclick="copyText(this,true)">Copy</button>`
-        : `${reply}<button class="copy-btn" onclick="copyText(this)">Copy</button>`;
+        ? `<pre><code>${data.reply.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</code></pre><button class="copy-btn" onclick="copyText(this,true)">Copy</button>`
+        : `${data.reply}<button class="copy-btn" onclick="copyText(this)">Copy</button>`;
     }
-    conversationHistory.push({ role:"model", content:reply });
+    conversationHistory.push({ role:"model", content:data.reply });
   } catch(err){
     typingDiv.textContent="❌ Gagal menghubungi AI.";
     console.error(err);
