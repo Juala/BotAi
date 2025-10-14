@@ -1,321 +1,209 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Roja AI Chat</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roja AI Chat</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Font & Icon -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
 
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #0f172a, #1e293b);
-    color: #fff;
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-  /* === LOGIN PAGE === */
-  #loginPage {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 16px;
-    padding: 30px 25px;
-    width: 90%;
-    max-width: 350px;
-    text-align: center;
-    box-shadow: 0 0 20px rgba(0,0,0,0.4);
-    backdrop-filter: blur(10px);
-  }
-  #loginPage h2 {
-    margin-bottom: 20px;
-    font-weight: 600;
-    font-size: 1.3rem;
-  }
-  #loginPage input {
-    width: 100%;
-    padding: 10px;
-    border: none;
-    border-radius: 8px;
-    background: rgba(255,255,255,0.1);
-    color: #fff;
-    font-size: 1rem;
-    margin-bottom: 12px;
-    outline: none;
-  }
-  #loginPage button {
-    width: 100%;
-    background: #3b82f6;
-    border: none;
-    border-radius: 8px;
-    padding: 10px;
-    color: #fff;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.3s;
-  }
-  #loginPage button:hover {
-    background: #2563eb;
-  }
-  .guest {
-    background: transparent;
-    border: 1px solid #3b82f6;
-    color: #3b82f6;
-    margin-top: 10px;
-  }
-  .guest:hover {
-    background: #3b82f6;
-    color: white;
-  }
+    header {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      text-align: center;
+      padding: 1rem;
+      font-weight: 600;
+      font-size: 1.3rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
 
-  /* === CHAT PAGE === */
-  #chatPage {
-    display: none;
-    flex-direction: column;
-    height: 100vh;
-    width: 100%;
-  }
+    #chatBox {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+      scroll-behavior: smooth;
+      display: flex;
+      flex-direction: column;
+    }
 
-  header {
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(10px);
-    padding: 10px 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 600;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-  }
-  #userName {
-    font-size: 0.9rem;
-    opacity: 0.8;
-  }
+    .message {
+      max-width: 85%;
+      padding: 10px 15px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      word-wrap: break-word;
+      position: relative;
+    }
 
-  #chatBox {
-    flex: 1;
-    overflow-y: auto;
-    padding: 15px;
-    scroll-behavior: smooth;
-    display: flex;
-    flex-direction: column;
-  }
+    .user {
+      background: #2563eb;
+      align-self: flex-end;
+      margin-left: auto;
+      border-bottom-right-radius: 0;
+    }
 
-  .message {
-    max-width: 80%;
-    padding: 10px 15px;
-    border-radius: 12px;
-    margin-bottom: 10px;
-    position: relative;
-  }
+    .bot {
+      background: rgba(255, 255, 255, 0.1);
+      align-self: flex-start;
+      border-bottom-left-radius: 0;
+    }
 
-  .user {
-    background: #2563eb;
-    align-self: flex-end;
-    border-bottom-right-radius: 0;
-  }
+    footer {
+      display: flex;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      position: sticky;
+      bottom: 0;
+    }
 
-  .bot {
-    background: rgba(255,255,255,0.1);
-    align-self: flex-start;
-    border-bottom-left-radius: 0;
-  }
+    input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
 
-  footer {
-    display: flex;
-    padding: 10px;
-    background: rgba(0,0,0,0.4);
-    border-top: 1px solid rgba(255,255,255,0.1);
-  }
+    button {
+      background: #3b82f6;
+      border: none;
+      border-radius: 8px;
+      margin-left: 10px;
+      padding: 0 15px;
+      cursor: pointer;
+      transition: 0.3s;
+      color: white;
+      font-weight: 600;
+    }
 
-  input {
-    flex: 1;
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-    outline: none;
-    background: rgba(255,255,255,0.1);
-    color: #fff;
-  }
+    button:hover {
+      background: #2563eb;
+    }
 
-  button {
-    background: #3b82f6;
-    border: none;
-    border-radius: 8px;
-    margin-left: 10px;
-    padding: 0 15px;
-    cursor: pointer;
-    transition: 0.3s;
-    color: white;
-    font-weight: 600;
-  }
+    .copy-btn {
+      position: absolute;
+      right: 8px;
+      top: 8px;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: #ccc;
+      cursor: pointer;
+      font-size: 0.8rem;
+      border-radius: 5px;
+      padding: 2px 6px;
+    }
 
-  button:hover {
-    background: #2563eb;
-  }
-
-  .copy-btn {
-    position: absolute;
-    right: 8px;
-    top: 8px;
-    background: rgba(255,255,255,0.1);
-    border: none;
-    color: #ccc;
-    cursor: pointer;
-    font-size: 0.8rem;
-    border-radius: 5px;
-    padding: 2px 6px;
-  }
-
-  small {
-    text-align: center;
-    color: #aaa;
-    font-size: 0.8rem;
-    padding: 5px;
-  }
-</style>
+    small {
+      text-align: center;
+      color: #aaa;
+      font-size: 0.8rem;
+      padding: 5px;
+    }
+  </style>
 </head>
 <body>
+  <header>🤖 Roja AI Chat</header>
 
-  <!-- LOGIN PAGE -->
-  <div id="loginPage">
-    <h2>🔐 Masuk ke Roja AI</h2>
-    <input id="emailInput" type="email" placeholder="Masukkan email kamu..." />
-    <button onclick="login()">Masuk</button>
-    <button class="guest" onclick="guestMode()">Masuk sebagai Guest</button>
-  </div>
+  <div id="chatBox"></div>
 
-  <!-- CHAT PAGE -->
-  <div id="chatPage">
-    <header>
-      <div>🤖 Roja AI Chat</div>
-      <div id="userName"></div>
-      <button onclick="logout()">Keluar</button>
-    </header>
+  <footer>
+    <input id="userInput" type="text" placeholder="Ketik pesan di sini..." />
+    <button onclick="sendMessage()"><i data-lucide="send"></i></button>
+  </footer>
 
-    <div id="chatBox"></div>
+  <small>© 2025 RojaServer | V2</small>
 
-    <footer>
-      <input id="userInput" type="text" placeholder="Ketik pesan..." />
-      <button onclick="sendMessage()"><i data-lucide="send"></i></button>
-    </footer>
+  <script>
+    lucide.createIcons();
 
-    <small>© 2025 RojaServer | V2</small>
-  </div>
+    const chatBox = document.getElementById("chatBox");
+    const input = document.getElementById("userInput");
 
-<script>
-  lucide.createIcons();
-  const chatBox = document.getElementById('chatBox');
-  const input = document.getElementById('userInput');
-  const loginPage = document.getElementById('loginPage');
-  const chatPage = document.getElementById('chatPage');
-  const userName = document.getElementById('userName');
-
-  let currentUser = localStorage.getItem("roja_user");
-
-  // === CEK LOGIN ===
-  window.onload = () => {
-    if (currentUser) {
-      openChat(currentUser);
-    }
-  };
-
-  function login() {
-    const email = document.getElementById("emailInput").value.trim();
-    if (!email) return alert("Masukkan email terlebih dahulu!");
-    localStorage.setItem("roja_user", email);
-    openChat(email);
-  }
-
-  function guestMode() {
-    const guestId = "Guest_" + Math.floor(Math.random() * 9999);
-    localStorage.setItem("roja_user", guestId);
-    openChat(guestId);
-  }
-
-  function logout() {
-    if (confirm("Yakin mau keluar?")) {
-      localStorage.removeItem("roja_user");
-      localStorage.removeItem(`roja_chat_${currentUser}`);
-      location.reload();
-    }
-  }
-
-  // === BUKA CHAT ===
-  function openChat(user) {
-    currentUser = user;
-    userName.textContent = `👤 ${user}`;
-    loginPage.style.display = "none";
-    chatPage.style.display = "flex";
-
-    const saved = localStorage.getItem(`roja_chat_${user}`);
-    if (saved) chatBox.innerHTML = saved;
-    else appendBot("Halo " + user + "! Aku Roja AI 🤖 Siap membantu kamu hari ini!");
-
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-
-  // === SIMPAN CHAT ===
-  function saveChat() {
-    localStorage.setItem(`roja_chat_${currentUser}`, chatBox.innerHTML);
-  }
-
-  // === KIRIM PESAN ===
-  function sendMessage() {
-    const msg = input.value.trim();
-    if (!msg) return;
-    appendUser(msg);
-    input.value = "";
-    fakeBotResponse(msg);
-  }
-
-  function appendUser(text) {
-    const div = document.createElement("div");
-    div.className = "message user";
-    div.innerText = text;
-    chatBox.appendChild(div);
-    saveChat();
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-
-  function appendBot(text) {
-    const div = document.createElement("div");
-    div.className = "message bot";
-    div.innerHTML = text.replace(/\n/g, "<br>");
-
-    const copyBtn = document.createElement("button");
-    copyBtn.className = "copy-btn";
-    copyBtn.innerText = "Copy";
-    copyBtn.onclick = () => {
-      navigator.clipboard.writeText(div.innerText);
-      copyBtn.innerText = "Copied!";
-      setTimeout(() => copyBtn.innerText = "Copy", 1500);
+    // === Load Chat Sebelumnya ===
+    window.onload = () => {
+      const saved = localStorage.getItem("roja_chat");
+      if (saved) chatBox.innerHTML = saved;
+      chatBox.scrollTop = chatBox.scrollHeight;
     };
-    div.appendChild(copyBtn);
 
-    chatBox.appendChild(div);
-    saveChat();
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
+    // === Simpan Otomatis ===
+    function saveChat() {
+      localStorage.setItem("roja_chat", chatBox.innerHTML);
+    }
 
-  // === SIMULASI AI ===
-  function fakeBotResponse(msg) {
-    const botMsg = document.createElement("div");
-    botMsg.className = "message bot";
-    botMsg.innerText = "⏳ Roja AI sedang mengetik...";
-    chatBox.appendChild(botMsg);
-    chatBox.scrollTop = chatBox.scrollHeight;
+    // === Kirim Pesan ===
+    function sendMessage() {
+      const text = input.value.trim();
+      if (!text) return;
 
-    setTimeout(() => {
-      botMsg.remove();
-      appendBot(`Halo ${currentUser}, kamu menanyakan: <b>${msg}</b><br><br>Roja AI akan segera menambah fitur baru yang lebih keren! ⚡`);
-    }, 900);
-  }
-</script>
+      appendUser(text);
+      input.value = "";
+      fakeBotResponse(text);
+    }
+
+    function appendUser(text) {
+      const div = document.createElement("div");
+      div.className = "message user";
+      div.innerText = text;
+      chatBox.appendChild(div);
+      saveChat();
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // === Simulasi Balasan AI ===
+    async function fakeBotResponse(userText) {
+      const botMsg = document.createElement("div");
+      botMsg.className = "message bot";
+      botMsg.innerHTML = "⏳ Sedang mengetik...";
+      chatBox.appendChild(botMsg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      setTimeout(() => {
+        let reply = `Jawaban untuk: <b>${userText}</b><br><br>Roja AI siap membantu kamu dengan tampilan modern dan fitur lengkap! 😎`;
+
+        botMsg.remove();
+        appendBot(reply);
+      }, 800);
+    }
+
+    // === Tambahkan Pesan Bot dengan Tombol Copy ===
+    function appendBot(text) {
+      const div = document.createElement("div");
+      div.className = "message bot";
+      div.innerHTML = text.replace(/\n/g, "<br>");
+
+      const copyBtn = document.createElement("button");
+      copyBtn.className = "copy-btn";
+      copyBtn.innerText = "Copy";
+      copyBtn.onclick = () => {
+        navigator.clipboard.writeText(div.innerText);
+        copyBtn.innerText = "Copied!";
+        setTimeout(() => (copyBtn.innerText = "Copy"), 1500);
+      };
+      div.appendChild(copyBtn);
+
+      chatBox.appendChild(div);
+      saveChat();
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  </script>
 </body>
 </html>
