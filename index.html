@@ -10,12 +10,11 @@
   body {
     font-family: 'Poppins', sans-serif;
     margin: 0;
-    background: radial-gradient(circle at top left, #0a0f24, #020617);
+    background-color: #0a0f24;
     color: #fff;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    overflow: hidden;
   }
 
   /* HEADER */
@@ -23,13 +22,15 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 20px;
-    background: rgba(20, 26, 53, 0.85);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    backdrop-filter: blur(10px);
+    padding: 12px 18px;
+    background: linear-gradient(135deg, #111831, #1c244a);
+    border-bottom: 1px solid #2a2f4a;
     position: fixed;
-    top: 0; left: 0; right: 0;
+    top: 0;
+    left: 0;
+    right: 0;
     z-index: 10;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
   }
 
   .chat-header-left {
@@ -38,35 +39,34 @@
   }
 
   .chat-header img {
-    width: 45px;
-    height: 45px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     object-fit: cover;
     margin-right: 10px;
-    box-shadow: 0 0 8px #0078ff80;
+    border: 2px solid #0078ff;
   }
 
   .chat-header h2 {
     margin: 0;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 600;
-    color: #38bdf8;
   }
 
   .chat-header-right button {
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: #1f2745;
+    border: none;
     color: #bbb;
-    font-size: 13px;
-    cursor: pointer;
-    border-radius: 8px;
+    font-size: 14px;
     padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
     transition: 0.3s;
   }
 
   .chat-header-right button:hover {
-    background: #0078ff;
     color: #fff;
+    background: #0078ff;
   }
 
   /* CHAT BOX */
@@ -76,108 +76,102 @@
     scroll-behavior: smooth;
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    padding: 15px;
     margin-top: 75px;
-    margin-bottom: 90px;
+    margin-bottom: 80px;
   }
 
   .message {
-    position: relative;
     margin: 10px 0;
-    max-width: 80%;
-    padding: 14px 16px;
-    border-radius: 14px;
+    max-width: 75%;
+    padding: 12px 16px;
+    border-radius: 12px;
     line-height: 1.6;
     word-wrap: break-word;
+    position: relative;
     animation: fadeIn 0.3s ease;
   }
 
   .user {
-    background: linear-gradient(135deg, #0078ff, #3b82f6);
+    background: #0078ff;
     align-self: flex-end;
     border-bottom-right-radius: 0;
-    margin-right: 8px;
-    color: #fff;
-    box-shadow: 0 0 8px #0078ff80;
+    margin-right: 5px;
   }
 
   .bot {
-    background: rgba(255,255,255,0.08);
+    background: #1b2140;
     align-self: flex-start;
     border-bottom-left-radius: 0;
-    margin-left: 8px;
-    border: 1px solid rgba(255,255,255,0.1);
+    margin-left: 5px;
   }
 
-  .bot pre, .bot code {
-    background: rgba(255,255,255,0.05);
-    display: block;
-    padding: 8px;
-    border-radius: 6px;
-    margin: 5px 0;
-    font-family: 'Courier New', monospace;
-    font-size: 13px;
-    color: #38bdf8;
-    overflow-x: auto;
+  .bot pre {
+    margin: 0;
+    white-space: pre-wrap;
   }
 
+  /* COPY BUTTON */
   .copy-btn {
     position: absolute;
-    bottom: 5px;
-    right: 10px;
-    font-size: 13px;
-    background: none;
+    bottom: 8px;
+    right: 8px;
+    background: #0078ff;
+    color: white;
     border: none;
-    color: #38bdf8;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 5px;
     cursor: pointer;
-    opacity: 0.7;
+    opacity: 0;
+    transition: 0.2s;
   }
 
-  .copy-btn:hover { opacity: 1; color: #60a5fa; }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+  .bot:hover .copy-btn {
+    opacity: 1;
   }
 
-  /* INPUT AREA */
+  .copy-btn:hover {
+    background: #005ec3;
+  }
+
+  /* INPUT */
   .chat-input {
     position: fixed;
-    bottom: 0; left: 0; right: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
     display: flex;
     padding: 12px;
-    background: rgba(20, 26, 53, 0.85);
-    border-top: 1px solid rgba(255,255,255,0.1);
-    backdrop-filter: blur(10px);
+    background: #141a35;
+    border-top: 1px solid #2a2f4a;
     z-index: 20;
   }
 
   .chat-input input {
     flex: 1;
-    padding: 12px 14px;
+    padding: 10px 14px;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     font-size: 15px;
     outline: none;
-    background: rgba(255,255,255,0.1);
+    background: #1f2745;
     color: #fff;
   }
 
   .chat-input button {
-    background: linear-gradient(135deg, #0078ff, #00c6ff);
+    background: #0078ff;
     color: #fff;
     border: none;
-    padding: 12px 18px;
+    padding: 10px 18px;
     margin-left: 10px;
-    border-radius: 10px;
+    border-radius: 8px;
     cursor: pointer;
-    font-weight: 600;
     transition: 0.2s;
-    box-shadow: 0 0 10px #0078ff80;
   }
 
   .chat-input button:hover {
-    transform: scale(1.05);
+    background: #0060d4;
   }
 
   /* FOOTER */
@@ -188,10 +182,15 @@
     color: #aaa;
     font-style: italic;
     position: fixed;
-    bottom: 65px;
+    bottom: 60px;
     left: 0;
     right: 0;
     background: transparent;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 </style>
 </head>
@@ -203,8 +202,8 @@
       <h2>Roja AI</h2>
     </div>
     <div class="chat-header-right">
-      <button onclick="newChat()">🗘 Percakapan Baru</button>
-      <button onclick="toggleFullscreen()">⛶ Fullscreen</button>
+      <button onclick="newChat()">Percakapan Baru</button>
+      <button onclick="toggleFullscreen()">Fullscreen</button>
     </div>
   </div>
 
@@ -215,7 +214,7 @@
     <button onclick="sendMessage()">Kirim</button>
   </div>
 
-  <div class="footer">© copyright@RojaServer | V3</div>
+  <div class="footer">copyright@RojaServer | V2</div>
 
 <script>
   const chatBox = document.getElementById('chatBox');
@@ -232,7 +231,7 @@
       chatBox.innerHTML = saved;
       conversationHistory = JSON.parse(savedHistory || "[]");
     } else {
-      appendBot("Halo, aku <b>Roja AI</b> 🤖<br>Ada yang bisa aku bantu hari ini?");
+      appendBot("Halo, aku Roja AI 🤖. Ada yang bisa aku bantu hari ini?");
     }
     chatBox.scrollTop = chatBox.scrollHeight;
   };
@@ -243,7 +242,7 @@
 
     appendUser(msg);
     input.value = "";
-    appendBot("<i>⏳ Roja AI sedang mengetik...</i>");
+    appendBot("⏳ Roja AI sedang mengetik...");
 
     conversationHistory.push({ role: "user", content: msg });
 
@@ -253,15 +252,14 @@
       const res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }]
-        })
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
       });
 
       const data = await res.json();
       const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Tidak ada respons dari AI.";
 
-      chatBox.lastElementChild.innerHTML = formatText(reply) + `<button class="copy-btn" onclick="copyText(this)">📋</button>`;
+      const lastBot = chatBox.lastElementChild;
+      lastBot.innerHTML = `<pre>${reply}</pre><button class="copy-btn" onclick="copyText(this)">Copy</button>`;
       conversationHistory.push({ role: "model", content: reply });
 
     } catch (err) {
@@ -285,26 +283,10 @@
   function appendBot(text) {
     const div = document.createElement("div");
     div.className = "message bot";
-    div.innerHTML = text;
+    div.innerHTML = `<pre>${text}</pre>`;
     chatBox.appendChild(div);
     saveChat();
     chatBox.scrollTop = chatBox.scrollHeight;
-  }
-
-  function formatText(text) {
-    return text
-      .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>") // bold
-      .replace(/\*(.*?)\*/g, "<i>$1</i>") // italic
-      .replace(/`([^`]+)`/g, "<code>$1</code>") // inline code
-      .replace(/```([^`]+)```/gs, "<pre>$1</pre>") // code block
-      .replace(/\n/g, "<br>"); // line break
-  }
-
-  function copyText(btn) {
-    const text = btn.parentElement.innerText;
-    navigator.clipboard.writeText(text);
-    btn.textContent = "✅";
-    setTimeout(() => btn.textContent = "📋", 1500);
   }
 
   function saveChat() {
@@ -316,7 +298,7 @@
     if (confirm("Mulai percakapan baru?")) {
       chatBox.innerHTML = "";
       conversationHistory = [];
-      appendBot("Percakapan baru dimulai. Halo, aku <b>Roja AI</b> 🤖");
+      appendBot("Percakapan baru dimulai. Halo, aku Roja AI 🤖");
       saveChat();
     }
   }
@@ -327,6 +309,13 @@
     } else {
       document.exitFullscreen();
     }
+  }
+
+  function copyText(btn) {
+    const text = btn.parentElement.querySelector("pre").innerText;
+    navigator.clipboard.writeText(text);
+    btn.textContent = "✅ Disalin";
+    setTimeout(() => btn.textContent = "Copy", 2000);
   }
 
   input.addEventListener("keypress", function(e) {
