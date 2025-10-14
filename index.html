@@ -77,6 +77,26 @@
   .bot { background: #1b2140; align-self: flex-start; border-bottom-left-radius: 0; margin-left: 5px; }
   .bot pre { margin: 0; white-space: pre-wrap; }
 
+  /* TYPING INDICATOR */
+  .typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .typing-indicator span {
+    width: 6px;
+    height: 6px;
+    background: #0078ff;
+    border-radius: 50%;
+    display: inline-block;
+    animation: bounce 0.6s infinite alternate;
+  }
+  .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce { to { transform: translateY(-5px); } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
   /* COPY BUTTON */
   .copy-btn {
     position: absolute;
@@ -142,8 +162,6 @@
     right: 0;
     background: transparent;
   }
-
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
   /* RIWAYAT CHAT PANEL */
   #chatHistoryPanel {
@@ -231,7 +249,9 @@
     if (!msg) return;
     appendUser(msg);
     input.value = "";
-    appendBot("⏳ Roja AI sedang mengetik...");
+
+    // tampilkan animated typing indicator
+    const typingDiv = appendBot("", true);
     conversationHistory.push({ role: "user", content: msg });
 
     try {
@@ -243,12 +263,13 @@
       });
       const data = await res.json();
       const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Tidak ada respons dari AI.";
-      const lastBot = chatBox.lastElementChild;
-      lastBot.innerHTML = `<pre>${reply}</pre><button class="copy-btn" onclick="copyText(this)">Copy</button>`;
+
+      // update typing indicator menjadi jawaban AI
+      typingDiv.innerHTML = `<pre>${reply}</pre><button class="copy-btn" onclick="copyText(this)">Copy</button>`;
       conversationHistory.push({ role: "model", content: reply });
     } catch (err) {
       console.error(err);
-      chatBox.lastElementChild.textContent = "❌ Gagal menghubungi API Gemini.";
+      typingDiv.textContent = "❌ Gagal menghubungi API Gemini.";
     }
     saveChat();
     chatBox.scrollTop = chatBox.scrollHeight;
@@ -263,13 +284,20 @@
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 
-  function appendBot(text) {
+  function appendBot(text, isTyping=false) {
     const div = document.createElement("div");
     div.className = "message bot";
-    div.innerHTML = `<pre>${text}</pre>`;
+    if(isTyping) {
+      div.innerHTML = `<div class="typing-indicator">
+                          <span></span><span></span><span></span>
+                       </div>`;
+    } else {
+      div.innerHTML = `<pre>${text}</pre><button class="copy-btn" onclick="copyText(this)">Copy</button>`;
+    }
     chatBox.appendChild(div);
     saveChat();
     chatBox.scrollTop = chatBox.scrollHeight;
+    return div; // untuk update typing nanti
   }
 
   function saveChat() {
@@ -279,13 +307,11 @@
 
   function newChat() {
     if (confirm("Mulai percakapan baru?")) {
-      // Simpan percakapan lama ke riwayat
       if (conversationHistory.length > 0) {
         let savedAllHistory = JSON.parse(localStorage.getItem('roja_all_history') || "[]");
         savedAllHistory.push([...conversationHistory]);
         localStorage.setItem('roja_all_history', JSON.stringify(savedAllHistory));
       }
-      // Mulai percakapan baru
       chatBox.innerHTML = "";
       conversationHistory = [];
       appendBot("Percakapan baru dimulai. Halo, aku Roja AI 🤖");
