@@ -18,9 +18,14 @@
   .chat-header {
     display: flex;
     align-items: center;
-    padding: 12px 20px;
+    justify-content: space-between;
+    padding: 12px 18px;
     background: #141a35;
     border-bottom: 1px solid #2a2f4a;
+  }
+  .chat-header-left {
+    display: flex;
+    align-items: center;
   }
   .chat-header img {
     width: 45px;
@@ -33,6 +38,22 @@
     margin: 0;
     font-size: 20px;
     font-weight: 600;
+  }
+  .chat-header-right {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .chat-header-right button {
+    background: none;
+    border: none;
+    color: #bbb;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  .chat-header-right button:hover {
+    color: #0078ff;
   }
   .chat-box {
     flex: 1;
@@ -55,14 +76,12 @@
     align-self: flex-end;
     border-bottom-right-radius: 0;
     margin-right: 5px;
-    margin-top: 4px;
   }
   .bot {
     background: #232a48;
     align-self: flex-start;
     border-bottom-left-radius: 0;
     margin-left: 5px;
-    margin-top: 8px;
   }
   .chat-input {
     display: flex;
@@ -92,26 +111,6 @@
   .chat-input button:hover {
     background: #0060d4;
   }
-  .controls {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    background: #0f1630;
-    padding: 8px 12px;
-    border-top: 1px solid #2a2f4a;
-  }
-  .controls button {
-    background: #232a48;
-    border: none;
-    color: #fff;
-    padding: 8px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.3s;
-  }
-  .controls button:hover {
-    background: #0078ff;
-  }
   .footer {
     text-align: center;
     padding: 10px;
@@ -125,8 +124,14 @@
 <body>
 
   <div class="chat-header">
-    <img src="roja-avatar.png" alt="Roja AI Avatar">
-    <h2>Roja AI</h2>
+    <div class="chat-header-left">
+      <img src="roja-avatar.png" alt="Roja AI Avatar">
+      <h2>Roja AI</h2>
+    </div>
+    <div class="chat-header-right">
+      <button onclick="newChat()">percakapannya baru</button>
+      <button onclick="toggleFullscreen()">full screen</button>
+    </div>
   </div>
 
   <div class="chat-box" id="chatBox"></div>
@@ -134,11 +139,6 @@
   <div class="chat-input">
     <input id="userInput" type="text" placeholder="Ketik pesan..." />
     <button onclick="sendMessage()">Kirim</button>
-  </div>
-
-  <div class="controls">
-    <button onclick="newChat()">🧹 Percakapan Baru</button>
-    <button onclick="toggleFullscreen()">⛶ Fullscreen</button>
   </div>
 
   <div class="footer">
@@ -160,7 +160,7 @@
     }
   };
 
-  // === Fungsi kirim pesan ===
+  // === Kirim pesan ===
   function sendMessage() {
     const msg = input.value.trim();
     if (!msg) return;
@@ -169,7 +169,7 @@
     setTimeout(() => appendBot(generateResponse(msg)), 600);
   }
 
-  // === Pesan user ===
+  // === Tambah pesan user ===
   function appendUser(text) {
     const div = document.createElement("div");
     div.className = "message user";
@@ -179,7 +179,7 @@
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 
-  // === Pesan bot ===
+  // === Tambah pesan bot ===
   function appendBot(text) {
     const div = document.createElement("div");
     div.className = "message bot";
@@ -189,7 +189,7 @@
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 
-  // === Contoh respons bot sederhana ===
+  // === Respon otomatis sederhana ===
   function generateResponse(msg) {
     msg = msg.toLowerCase();
     if (msg.includes("halo")) return "Hai juga! Apa kabar hari ini?";
@@ -203,7 +203,7 @@
     localStorage.setItem('roja_chat', chatBox.innerHTML);
   }
 
-  // === Chat baru ===
+  // === Percakapan baru ===
   function newChat() {
     if (confirm("Mulai percakapan baru?")) {
       chatBox.innerHTML = "";
@@ -221,7 +221,7 @@
     }
   }
 
-  // === Enter untuk kirim ===
+  // === Tekan Enter untuk kirim ===
   input.addEventListener("keypress", function(e) {
     if (e.key === "Enter") sendMessage();
   });
