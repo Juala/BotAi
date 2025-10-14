@@ -1,504 +1,283 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Roja AI Chat</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roja AI Chat</title>
 
-  <!-- FONT & ICON -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- Highlight.js -->
-  <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
-
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #0f172a, #1e293b);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    header {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(10px);
-      text-align: center;
-      padding: 1rem;
-      font-weight: 600;
-      font-size: 1.3rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    #chatBox {
-      flex: 1;
-      overflow-y: auto;
-      padding: 15px;
-      scroll-behavior: smooth;
-    }
-
-    .message {
-      max-width: 85%;
-      padding: 10px 15px;
-      border-radius: 12px;
-      margin-bottom: 12px;
-      word-wrap: break-word;
-      position: relative;
-    }
-
-    .user {
-      background: #2563eb;
-      align-self: flex-end;
-      margin-left: auto;
-      border-bottom-right-radius: 0;
-    }
-
-    .bot {
-      background: rgba(255, 255, 255, 0.1);
-      align-self: flex-start;
-      border-bottom-left-radius: 0;
-    }
-
-    .chat-container {
-      display: flex;
-      flex-direction: column;
-    }
-
-    footer {
-      display: flex;
-      padding: 10px;
-      background: rgba(0, 0, 0, 0.5);
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      position: sticky;
-      bottom: 0;
-    }
-
-    input {
-      flex: 1;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      outline: none;
-      font-size: 1rem;
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
-    }
-
-    button {
-      background: #3b82f6;
-      border: none;
-      border-radius: 8px;
-      margin-left: 10px;
-      padding: 0 15px;
-      cursor: pointer;
-      transition: 0.3s;
-      color: white;
-      font-weight: 600;
-    }
-
-    button:hover {
-      background: #2563eb;
-    }
-
-    pre {
-      background: rgba(0, 0, 0, 0.4);
-      padding: 10px;
-      border-radius: 10px;
-      overflow-x: auto;
-      font-size: 0.9rem;
-    }
-
-    .copy-btn {
-      position: absolute;
-      right: 8px;
-      top: 8px;
-      background: rgba(255,255,255,0.1);
-      border: none;
-      color: #ccc;
-      cursor: pointer;
-      font-size: 0.8rem;
-      border-radius: 5px;
-      padding: 2px 6px;
-    }
-
-    footer input::placeholder { color: #aaa; }
-
-    footer button svg {
-      width: 20px;
-      height: 20px;
-    }
-
-    footer button:active {
-      transform: scale(0.95);
-    }
-
-    small {
-      text-align: center;
-      color: #aaa;
-      font-size: 0.8rem;
-      padding: 5px;
-    }
-  </style>
-</head>
-<body>
-  <header>🤖 Roja AI Chat</header>
-
-  <div id="chatBox" class="chat-container"></div>
-
-  <footer>
-    <input id="userInput" type="text" placeholder="Ketik pesan di sini..." />
-    <button onclick="sendMessage()"><i data-lucide="send"></i></button>
-  </footer>
-
-  <small>© 2025 RojaServer | V2</small>
-
-  <script>
-    lucide.createIcons();
-
-    const chatBox = document.getElementById("chatBox");
-    const input = document.getElementById("userInput");
-
-    // === Load Chat Sebelumnya ===
-    window.onload = () => {
-      const saved = localStorage.getItem("roja_chat");
-      if (saved) chatBox.innerHTML = saved;
-      hljs.highlightAll();
-      chatBox.scrollTop = chatBox.scrollHeight;
-    };
-
-    // === Simpan Otomatis ===
-    function saveChat() {
-      localStorage.setItem("roja_chat", chatBox.innerHTML);
-    }
-
-    // === Kirim Pesan ===
-    function sendMessage() {
-      const text = input.value.trim();
-      if (!text) return;
-
-      appendUser(text);
-      input.value = "";
-      fakeBotResponse(text);
-    }
-
-    function appendUser(text) {
-      const div = document.createElement("div");
-      div.className = "message user";
-      div.innerText = text;
-      chatBox.appendChild(div);
-      saveChat();
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    // === Simulasi Balasan AI (ganti nanti dengan API real) ===
-    async function fakeBotResponse(userText) {
-      const botMsg = document.createElement("div");
-      botMsg.className = "message bot";
-      botMsg.innerHTML = "⏳ Sedang mengetik...";
-      chatBox.appendChild(botMsg);
-      chatBox.scrollTop = chatBox.scrollHeight;
-
-      setTimeout(() => {
-        let reply;
-        if (userText.toLowerCase().includes("html")) {
-          reply = `Berikut contoh kodenya:\n\n\`\`\`html
-<!DOCTYPE html>
-<html>
-  <body>
-    <h1>Halo dari Roja AI!</h1>
-  </body>
-</html>
-\`\`\``;
-        } else {
-          reply = `Jawaban untuk: <b>${userText}</b><br><br>Roja AI siap membantu kamu dengan gaya modern! 😎`;
-        }
-
-        botMsg.remove();
-        appendBot(reply);
-      }, 800);
-    }
-
-    // === Tambahkan Pesan Bot dengan Highlight & Tombol Copy ===
-    function appendBot(text) {
-      const div = document.createElement("div");
-      div.className = "message bot";
-
-      if (text.includes("```")) {
-        text = text.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
-          return `<pre><code class="language-${lang || 'plaintext'}">${code.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>`;
-        });
-      } else {
-        text = text.replace(/\n/g, "<br>");
-      }
-
-      div.innerHTML = text;
-
-      // Tombol copy
-      const copyBtn = document.createElement("button");
-      copyBtn.className = "copy-btn";
-      copyBtn.innerText = "Copy";
-      copyBtn.onclick = () => {
-        navigator.clipboard.writeText(div.innerText);
-        copyBtn.innerText = "Copied!";
-        setTimeout(() => (copyBtn.innerText = "Copy"), 1500);
-      };
-      div.appendChild(copyBtn);
-
-      chatBox.appendChild(div);
-      saveChat();
-      hljs.highlightAll();
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-  </script>
-</body>
-</html>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: #fff;
+    height: 100vh;
+    overflow: hidden;
     display: flex;
+    justify-content: center;
     align-items: center;
   }
 
-  .chat-header img {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-right: 10px;
-    border: 2px solid #0078ff;
+  /* === LOGIN PAGE === */
+  #loginPage {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 30px 25px;
+    width: 90%;
+    max-width: 350px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    backdrop-filter: blur(10px);
   }
-
-  .chat-header h2 {
-    margin: 0;
-    font-size: 20px;
+  #loginPage h2 {
+    margin-bottom: 20px;
     font-weight: 600;
+    font-size: 1.3rem;
   }
-
-  .chat-header-right button {
-    background: #1f2745;
+  #loginPage input {
+    width: 100%;
+    padding: 10px;
     border: none;
-    color: #bbb;
-    font-size: 14px;
-    padding: 6px 10px;
-    border-radius: 6px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    font-size: 1rem;
+    margin-bottom: 12px;
+    outline: none;
+  }
+  #loginPage button {
+    width: 100%;
+    background: #3b82f6;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    color: #fff;
+    font-weight: 600;
     cursor: pointer;
     transition: 0.3s;
   }
-
-  .chat-header-right button:hover {
-    color: #fff;
-    background: #0078ff;
+  #loginPage button:hover {
+    background: #2563eb;
+  }
+  .guest {
+    background: transparent;
+    border: 1px solid #3b82f6;
+    color: #3b82f6;
+    margin-top: 10px;
+  }
+  .guest:hover {
+    background: #3b82f6;
+    color: white;
   }
 
-  /* CHAT BOX */
-  .chat-box {
+  /* === CHAT PAGE === */
+  #chatPage {
+    display: none;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+  }
+
+  header {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  #userName {
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+
+  #chatBox {
     flex: 1;
     overflow-y: auto;
+    padding: 15px;
     scroll-behavior: smooth;
     display: flex;
     flex-direction: column;
-    padding: 15px;
-    margin-top: 75px;
-    margin-bottom: 80px;
   }
 
   .message {
-    margin: 10px 0;
-    max-width: 75%;
-    padding: 12px 16px;
+    max-width: 80%;
+    padding: 10px 15px;
     border-radius: 12px;
-    line-height: 1.6;
-    word-wrap: break-word;
+    margin-bottom: 10px;
     position: relative;
-    animation: fadeIn 0.3s ease;
   }
 
   .user {
-    background: #0078ff;
+    background: #2563eb;
     align-self: flex-end;
     border-bottom-right-radius: 0;
-    margin-right: 5px;
   }
 
   .bot {
-    background: #1b2140;
+    background: rgba(255,255,255,0.1);
     align-self: flex-start;
     border-bottom-left-radius: 0;
-    margin-left: 5px;
   }
 
-  .bot pre {
-    margin: 0;
-    white-space: pre-wrap;
+  footer {
+    display: flex;
+    padding: 10px;
+    background: rgba(0,0,0,0.4);
+    border-top: 1px solid rgba(255,255,255,0.1);
   }
 
-  /* COPY BUTTON */
+  input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+  }
+
+  button {
+    background: #3b82f6;
+    border: none;
+    border-radius: 8px;
+    margin-left: 10px;
+    padding: 0 15px;
+    cursor: pointer;
+    transition: 0.3s;
+    color: white;
+    font-weight: 600;
+  }
+
+  button:hover {
+    background: #2563eb;
+  }
+
   .copy-btn {
     position: absolute;
-    bottom: 8px;
     right: 8px;
-    background: #0078ff;
-    color: white;
+    top: 8px;
+    background: rgba(255,255,255,0.1);
     border: none;
-    font-size: 12px;
-    padding: 4px 8px;
+    color: #ccc;
+    cursor: pointer;
+    font-size: 0.8rem;
     border-radius: 5px;
-    cursor: pointer;
-    opacity: 0;
-    transition: 0.2s;
+    padding: 2px 6px;
   }
 
-  .bot:hover .copy-btn {
-    opacity: 1;
-  }
-
-  .copy-btn:hover {
-    background: #005ec3;
-  }
-
-  /* INPUT */
-  .chat-input {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    padding: 12px;
-    background: #141a35;
-    border-top: 1px solid #2a2f4a;
-    z-index: 20;
-  }
-
-  .chat-input input {
-    flex: 1;
-    padding: 10px 14px;
-    border: none;
-    border-radius: 8px;
-    font-size: 15px;
-    outline: none;
-    background: #1f2745;
-    color: #fff;
-  }
-
-  .chat-input button {
-    background: #0078ff;
-    color: #fff;
-    border: none;
-    padding: 10px 18px;
-    margin-left: 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-
-  .chat-input button:hover {
-    background: #0060d4;
-  }
-
-  /* FOOTER */
-  .footer {
+  small {
     text-align: center;
-    padding: 8px;
-    font-size: 12px;
     color: #aaa;
-    font-style: italic;
-    position: fixed;
-    bottom: 60px;
-    left: 0;
-    right: 0;
-    background: transparent;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    font-size: 0.8rem;
+    padding: 5px;
   }
 </style>
 </head>
 <body>
 
-  <div class="chat-header">
-    <div class="chat-header-left">
-      <img src="roja-avatar.png" alt="Roja AI Avatar">
-      <h2>Roja AI</h2>
-    </div>
-    <div class="chat-header-right">
-      <button onclick="newChat()">Percakapan Baru</button>
-      <button onclick="toggleFullscreen()">Fullscreen</button>
-    </div>
+  <!-- LOGIN PAGE -->
+  <div id="loginPage">
+    <h2>🔐 Masuk ke Roja AI</h2>
+    <input id="emailInput" type="email" placeholder="Masukkan email kamu..." />
+    <button onclick="login()">Masuk</button>
+    <button class="guest" onclick="guestMode()">Masuk sebagai Guest</button>
   </div>
 
-  <div class="chat-box" id="chatBox"></div>
+  <!-- CHAT PAGE -->
+  <div id="chatPage">
+    <header>
+      <div>🤖 Roja AI Chat</div>
+      <div id="userName"></div>
+      <button onclick="logout()">Keluar</button>
+    </header>
 
-  <div class="chat-input">
-    <input id="userInput" type="text" placeholder="Ketik pesan..." />
-    <button onclick="sendMessage()">Kirim</button>
+    <div id="chatBox"></div>
+
+    <footer>
+      <input id="userInput" type="text" placeholder="Ketik pesan..." />
+      <button onclick="sendMessage()"><i data-lucide="send"></i></button>
+    </footer>
+
+    <small>© 2025 RojaServer | V2</small>
   </div>
-
-  <div class="footer">copyright@RojaServer | V2</div>
 
 <script>
+  lucide.createIcons();
   const chatBox = document.getElementById('chatBox');
   const input = document.getElementById('userInput');
-  const GEMINI_API_KEY = "AIzaSyC310duBltZgbkMMfqRoAn6qVELo7x2slI"; 
-  const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+  const loginPage = document.getElementById('loginPage');
+  const chatPage = document.getElementById('chatPage');
+  const userName = document.getElementById('userName');
 
-  let conversationHistory = [];
+  let currentUser = localStorage.getItem("roja_user");
 
-  window.onload = function() {
-    const saved = localStorage.getItem('roja_chat');
-    const savedHistory = localStorage.getItem('roja_history');
-    if (saved) {
-      chatBox.innerHTML = saved;
-      conversationHistory = JSON.parse(savedHistory || "[]");
-    } else {
-      appendBot("Halo, aku Roja AI 🤖. Ada yang bisa aku bantu hari ini?");
+  // === CEK LOGIN ===
+  window.onload = () => {
+    if (currentUser) {
+      openChat(currentUser);
     }
-    chatBox.scrollTop = chatBox.scrollHeight;
   };
 
-  async function sendMessage() {
+  function login() {
+    const email = document.getElementById("emailInput").value.trim();
+    if (!email) return alert("Masukkan email terlebih dahulu!");
+    localStorage.setItem("roja_user", email);
+    openChat(email);
+  }
+
+  function guestMode() {
+    const guestId = "Guest_" + Math.floor(Math.random() * 9999);
+    localStorage.setItem("roja_user", guestId);
+    openChat(guestId);
+  }
+
+  function logout() {
+    if (confirm("Yakin mau keluar?")) {
+      localStorage.removeItem("roja_user");
+      localStorage.removeItem(`roja_chat_${currentUser}`);
+      location.reload();
+    }
+  }
+
+  // === BUKA CHAT ===
+  function openChat(user) {
+    currentUser = user;
+    userName.textContent = `👤 ${user}`;
+    loginPage.style.display = "none";
+    chatPage.style.display = "flex";
+
+    const saved = localStorage.getItem(`roja_chat_${user}`);
+    if (saved) chatBox.innerHTML = saved;
+    else appendBot("Halo " + user + "! Aku Roja AI 🤖 Siap membantu kamu hari ini!");
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  // === SIMPAN CHAT ===
+  function saveChat() {
+    localStorage.setItem(`roja_chat_${currentUser}`, chatBox.innerHTML);
+  }
+
+  // === KIRIM PESAN ===
+  function sendMessage() {
     const msg = input.value.trim();
     if (!msg) return;
-
     appendUser(msg);
     input.value = "";
-    appendBot("⏳ Roja AI sedang mengetik...");
-
-    conversationHistory.push({ role: "user", content: msg });
-
-    try {
-      const prompt = conversationHistory.map(m => `${m.role}: ${m.content}`).join("\n");
-
-      const res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-      });
-
-      const data = await res.json();
-      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Tidak ada respons dari AI.";
-
-      const lastBot = chatBox.lastElementChild;
-      lastBot.innerHTML = `<pre>${reply}</pre><button class="copy-btn" onclick="copyText(this)">Copy</button>`;
-      conversationHistory.push({ role: "model", content: reply });
-
-    } catch (err) {
-      console.error(err);
-      chatBox.lastElementChild.textContent = "❌ Gagal menghubungi API Gemini.";
-    }
-
-    saveChat();
-    chatBox.scrollTop = chatBox.scrollHeight;
+    fakeBotResponse(msg);
   }
 
   function appendUser(text) {
     const div = document.createElement("div");
     div.className = "message user";
-    div.textContent = text;
+    div.innerText = text;
     chatBox.appendChild(div);
     saveChat();
     chatBox.scrollTop = chatBox.scrollHeight;
@@ -507,45 +286,36 @@
   function appendBot(text) {
     const div = document.createElement("div");
     div.className = "message bot";
-    div.innerHTML = `<pre>${text}</pre>`;
+    div.innerHTML = text.replace(/\n/g, "<br>");
+
+    const copyBtn = document.createElement("button");
+    copyBtn.className = "copy-btn";
+    copyBtn.innerText = "Copy";
+    copyBtn.onclick = () => {
+      navigator.clipboard.writeText(div.innerText);
+      copyBtn.innerText = "Copied!";
+      setTimeout(() => copyBtn.innerText = "Copy", 1500);
+    };
+    div.appendChild(copyBtn);
+
     chatBox.appendChild(div);
     saveChat();
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 
-  function saveChat() {
-    localStorage.setItem('roja_chat', chatBox.innerHTML);
-    localStorage.setItem('roja_history', JSON.stringify(conversationHistory));
-  }
+  // === SIMULASI AI ===
+  function fakeBotResponse(msg) {
+    const botMsg = document.createElement("div");
+    botMsg.className = "message bot";
+    botMsg.innerText = "⏳ Roja AI sedang mengetik...";
+    chatBox.appendChild(botMsg);
+    chatBox.scrollTop = chatBox.scrollHeight;
 
-  function newChat() {
-    if (confirm("Mulai percakapan baru?")) {
-      chatBox.innerHTML = "";
-      conversationHistory = [];
-      appendBot("Percakapan baru dimulai. Halo, aku Roja AI 🤖");
-      saveChat();
-    }
+    setTimeout(() => {
+      botMsg.remove();
+      appendBot(`Halo ${currentUser}, kamu menanyakan: <b>${msg}</b><br><br>Roja AI akan segera menambah fitur baru yang lebih keren! ⚡`);
+    }, 900);
   }
-
-  function toggleFullscreen() {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-    } else {
-      document.exitFullscreen();
-    }
-  }
-
-  function copyText(btn) {
-    const text = btn.parentElement.querySelector("pre").innerText;
-    navigator.clipboard.writeText(text);
-    btn.textContent = "✅ Disalin";
-    setTimeout(() => btn.textContent = "Copy", 2000);
-  }
-
-  input.addEventListener("keypress", function(e) {
-    if (e.key === "Enter") sendMessage();
-  });
 </script>
-
 </body>
 </html>
