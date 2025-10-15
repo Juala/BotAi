@@ -5,323 +5,221 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Roja AI Chat</title>
 <style>
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Poppins', sans-serif; margin: 0; background-color: #0a0f24; color: #fff; display: flex; flex-direction: column; min-height: 100vh; }
 
-  body {
-    font-family: 'Poppins', sans-serif;
-    margin: 0;
-    background-color: #0a0f24;
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
+  .chat-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; background: linear-gradient(135deg, #111831, #1c244a); border-bottom: 1px solid #2a2f4a; position: fixed; top: 0; left: 0; right: 0; z-index: 10; box-shadow: 0 2px 10px rgba(0,0,0,0.4); }
+  .chat-header-left { display: flex; align-items: center; }
+  .chat-header img { width:48px; height:48px; border-radius:50%; object-fit:cover; margin-right:10px; border:2px solid #0078ff; }
+  .chat-header h2 { margin:0; font-size:20px; font-weight:600; }
+  .chat-header-right button { background:#1f2745; border:none; color:#bbb; font-size:14px; padding:6px 10px; border-radius:6px; cursor:pointer; transition:0.3s; }
+  .chat-header-right button:hover { color:#fff; background:#0078ff; }
 
-  /* HEADER */
-  .chat-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 18px;
-    background: linear-gradient(135deg, #111831, #1c244a);
-    border-bottom: 1px solid #2a2f4a;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 10;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
-  }
+  .chat-box { flex:1; overflow-y:auto; scroll-behavior:smooth; display:flex; flex-direction:column; padding:15px; margin-top:75px; margin-bottom:80px; }
+  .message { margin:10px 0; max-width:75%; padding:12px 16px; border-radius:12px; line-height:1.6; word-wrap:break-word; position:relative; animation:fadeIn 0.3s ease; }
+  .user { background:#0078ff; align-self:flex-end; border-bottom-right-radius:0; margin-right:5px; }
+  .bot { background:#1b2140; align-self:flex-start; border-bottom-left-radius:0; margin-left:5px; }
+  .bot pre { margin:0; white-space:pre-wrap; }
 
-  .chat-header-left {
-    display: flex;
-    align-items: center;
-  }
+  .typing-indicator { display:flex; align-items:center; gap:3px; }
+  .typing-indicator span { width:6px; height:6px; background:#0078ff; border-radius:50%; display:inline-block; animation:bounce 0.6s infinite alternate; }
+  .typing-indicator span:nth-child(2) { animation-delay:0.2s; }
+  .typing-indicator span:nth-child(3) { animation-delay:0.4s; }
 
-  .chat-header img {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-right: 10px;
-    border: 2px solid #0078ff;
-  }
+  @keyframes bounce { to { transform: translateY(-5px); } }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
-  .chat-header h2 {
-    margin: 0;
-    font-size: 20px;
-    font-weight: 600;
-  }
+  .copy-btn { position:absolute; bottom:8px; right:8px; background:#0078ff; color:white; border:none; font-size:12px; padding:4px 8px; border-radius:5px; cursor:pointer; opacity:0; transition:0.2s; }
+  .bot:hover .copy-btn { opacity:1; }
+  .copy-btn:hover { background:#005ec3; }
 
-  .chat-header-right button {
-    background: #1f2745;
-    border: none;
-    color: #bbb;
-    font-size: 14px;
-    padding: 6px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.3s;
-  }
+  .chat-input { position:fixed; bottom:0; left:0; right:0; display:flex; padding:12px; background:#141a35; border-top:1px solid #2a2f4a; z-index:20; }
+  .chat-input input { flex:1; padding:10px 14px; border:none; border-radius:8px; font-size:15px; outline:none; background:#1f2745; color:#fff; }
+  .chat-input button { background:#0078ff; color:#fff; border:none; padding:10px 18px; margin-left:10px; border-radius:8px; cursor:pointer; transition:0.2s; }
+  .chat-input button:hover { background:#0060d4; }
 
-  .chat-header-right button:hover {
-    color: #fff;
-    background: #0078ff;
-  }
+  .footer { text-align:center; padding:8px; font-size:12px; color:#aaa; font-style:italic; position:fixed; bottom:60px; left:0; right:0; background:transparent; }
 
-  /* CHAT BOX */
-  .chat-box {
-    flex: 1;
-    overflow-y: auto;
-    scroll-behavior: smooth;
-    display: flex;
-    flex-direction: column;
-    padding: 15px;
-    margin-top: 75px;
-    margin-bottom: 80px;
-  }
-
-  .message {
-    margin: 10px 0;
-    max-width: 75%;
-    padding: 12px 16px;
-    border-radius: 12px;
-    line-height: 1.6;
-    word-wrap: break-word;
-    position: relative;
-    animation: fadeIn 0.3s ease;
-  }
-
-  .user {
-    background: #0078ff;
-    align-self: flex-end;
-    border-bottom-right-radius: 0;
-    margin-right: 5px;
-  }
-
-  .bot {
-    background: #1b2140;
-    align-self: flex-start;
-    border-bottom-left-radius: 0;
-    margin-left: 5px;
-  }
-
-  .bot pre {
-    margin: 0;
-    white-space: pre-wrap;
-  }
-
-  /* COPY BUTTON */
-  .copy-btn {
-    position: absolute;
-    bottom: 8px;
-    right: 8px;
-    background: #0078ff;
-    color: white;
-    border: none;
-    font-size: 12px;
-    padding: 4px 8px;
-    border-radius: 5px;
-    cursor: pointer;
-    opacity: 0;
-    transition: 0.2s;
-  }
-
-  .bot:hover .copy-btn {
-    opacity: 1;
-  }
-
-  .copy-btn:hover {
-    background: #005ec3;
-  }
-
-  /* INPUT */
-  .chat-input {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    padding: 12px;
-    background: #141a35;
-    border-top: 1px solid #2a2f4a;
-    z-index: 20;
-  }
-
-  .chat-input input {
-    flex: 1;
-    padding: 10px 14px;
-    border: none;
-    border-radius: 8px;
-    font-size: 15px;
-    outline: none;
-    background: #1f2745;
-    color: #fff;
-  }
-
-  .chat-input button {
-    background: #0078ff;
-    color: #fff;
-    border: none;
-    padding: 10px 18px;
-    margin-left: 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-
-  .chat-input button:hover {
-    background: #0060d4;
-  }
-
-  /* FOOTER */
-  .footer {
-    text-align: center;
-    padding: 8px;
-    font-size: 12px;
-    color: #aaa;
-    font-style: italic;
-    position: fixed;
-    bottom: 60px;
-    left: 0;
-    right: 0;
-    background: transparent;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  #chatHistoryPanel { position:fixed; top:75px; right:-320px; width:300px; height:calc(100% - 75px); background:#141a35; border-left:1px solid #2a2f4a; overflow-y:auto; transition:0.3s; padding:10px; z-index:15; }
+  #chatHistoryPanel h3 { color:#fff; font-size:16px; margin-bottom:10px; }
+  #chatHistoryList li { padding:6px; margin-bottom:4px; border-radius:6px; cursor:pointer; color:#fff; }
+  #openHistoryBtn { position:fixed; top:85px; right:10px; z-index:20; padding:6px 10px; border:none; background:#1f2745; color:#fff; border-radius:6px; cursor:pointer; }
 </style>
 </head>
 <body>
 
-  <div class="chat-header">
-    <div class="chat-header-left">
-      <img src="roja-avatar.png" alt="Roja AI Avatar">
-      <h2>Roja AI</h2>
-    </div>
-    <div class="chat-header-right">
-      <button onclick="newChat()">Percakapan Baru</button>
-      <button onclick="toggleFullscreen()">Fullscreen</button>
-    </div>
-  </div>
+<div class="chat-header">
+  <div class="chat-header-left">
+    <img src="roja-avatar.png" alt="Roja AI Avatar">
+    <h2>Roja AI</h2>
+  </div>
+  <div class="chat-header-right">
+    <button onclick="newChat()">Percakapan Baru</button>
+    <button onclick="toggleFullscreen()">Fullscreen</button>
+  </div>
+</div>
 
-  <div class="chat-box" id="chatBox"></div>
+<div class="chat-box" id="chatBox"></div>
 
-  <div class="chat-input">
-    <input id="userInput" type="text" placeholder="Ketik pesan..." />
-    <button onclick="sendMessage()">Kirim</button>
-  </div>
+<div class="chat-input">
+  <input id="userInput" type="text" placeholder="Ketik pesan..." />
+  <button onclick="sendMessage()">Kirim</button>
+</div>
 
-  <div class="footer">copyright@RojaServer | V2</div>
+<div class="footer">copyright@RojaServer | V2</div>
+
+<div id="chatHistoryPanel">
+  <h3>Riwayat Chat</h3>
+  <ul id="chatHistoryList"></ul>
+  <button onclick="closeHistory()">Tutup</button>
+</div>
+<button id="openHistoryBtn">Riwayat</button>
 
 <script>
-  const chatBox = document.getElementById('chatBox');
-  const input = document.getElementById('userInput');
-  const GEMINI_API_KEY = "AIzaSyC310duBltZgbkMMfqRoAn6qVELo7x2slI"; 
-  const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+const chatBox = document.getElementById('chatBox');
+const input = document.getElementById('userInput');
+const chatHistoryPanel = document.getElementById('chatHistoryPanel');
+const chatHistoryList = document.getElementById('chatHistoryList');
+const openHistoryBtn = document.getElementById('openHistoryBtn');
 
-  let conversationHistory = [];
+const GEMINI_API_KEY = "AIzaSyC310duBltZgbkMMfqRoAn6qVELo7x2slI"; 
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
-  window.onload = function() {
-    const saved = localStorage.getItem('roja_chat');
-    const savedHistory = localStorage.getItem('roja_history');
-    if (saved) {
-      chatBox.innerHTML = saved;
-      conversationHistory = JSON.parse(savedHistory || "[]");
-    } else {
-      appendBot("Halo, aku Roja AI 🤖. Ada yang bisa aku bantu hari ini?");
-    }
-    chatBox.scrollTop = chatBox.scrollHeight;
-  };
+let conversationHistory = [];
 
-  async function sendMessage() {
-    const msg = input.value.trim();
-    if (!msg) return;
+window.onload = function() {
+  const saved = localStorage.getItem('roja_chat');
+  const savedHistory = localStorage.getItem('roja_history');
+  if (saved) {
+    chatBox.innerHTML = saved;
+    conversationHistory = JSON.parse(savedHistory || "[]");
+  } else {
+    appendBot("Halo, aku Roja AI 🤖. Ada yang bisa aku bantu hari ini?");
+  }
+  chatBox.scrollTop = chatBox.scrollHeight;
+};
 
-    appendUser(msg);
-    input.value = "";
-    appendBot("⏳ Roja AI sedang mengetik...");
+async function sendMessage() {
+  const msg = input.value.trim();
+  if (!msg) return;
+  appendUser(msg);
+  input.value = "";
 
-    conversationHistory.push({ role: "user", content: msg });
+  const typingDiv = appendBot("", true);
+  conversationHistory.push({ role: "user", content: msg });
 
-    try {
-      const prompt = conversationHistory.map(m => `${m.role}: ${m.content}`).join("\n");
+  try {
+    const contextPrompt = conversationHistory.map(m => `${m.role === "user" ? "User" : "AI"}: ${m.content}`).join("\n");
+    const res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contents: [{ parts: [{ text: contextPrompt }] }] })
+    });
+    const data = await res.json();
+    let reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Tidak ada respons dari AI.";
 
-      const res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-      });
+    const isCodeRequest = /buatkan kode|html|css|javascript|js|php|python|csharp|java/i.test(msg);
+    if (isCodeRequest) {
+      reply = `<pre><code>${reply.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</code></pre>`;
+    }
 
-      const data = await res.json();
-      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Tidak ada respons dari AI.";
+    typingDiv.innerHTML = `${reply}<button class="copy-btn" onclick="copyText(this, ${isCodeRequest})">Copy</button>`;
+    conversationHistory.push({ role: "model", content: reply });
 
-      const lastBot = chatBox.lastElementChild;
-      lastBot.innerHTML = `<pre>${reply}</pre><button class="copy-btn" onclick="copyText(this)">Copy</button>`;
-      conversationHistory.push({ role: "model", content: reply });
+  } catch (err) {
+    console.error(err);
+    typingDiv.textContent = "❌ Gagal menghubungi API Gemini.";
+  }
 
-    } catch (err) {
-      console.error(err);
-      chatBox.lastElementChild.textContent = "❌ Gagal menghubungi API Gemini.";
-    }
+  saveChat();
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
 
-    saveChat();
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
+function appendUser(text) {
+  const div = document.createElement("div");
+  div.className = "message user";
+  div.textContent = text;
+  chatBox.appendChild(div);
+  saveChat();
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
 
-  function appendUser(text) {
-    const div = document.createElement("div");
-    div.className = "message user";
-    div.textContent = text;
-    chatBox.appendChild(div);
-    saveChat();
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
+function appendBot(text, isTyping=false) {
+  const div = document.createElement("div");
+  div.className = "message bot";
+  if(isTyping) div.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
+  else div.innerHTML = `${text}<button class="copy-btn" onclick="copyText(this)">Copy</button>`;
+  chatBox.appendChild(div);
+  saveChat();
+  chatBox.scrollTop = chatBox.scrollHeight;
+  return div;
+}
 
-  function appendBot(text) {
-    const div = document.createElement("div");
-    div.className = "message bot";
-    div.innerHTML = `<pre>${text}</pre>`;
-    chatBox.appendChild(div);
-    saveChat();
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
+function copyText(btn, isCode=false) {
+  let text;
+  if (isCode) {
+    text = btn.parentElement.querySelector("pre code")?.innerText || "";
+  } else {
+    text = btn.parentElement.innerText.replace("Copy","").trim();
+  }
+  navigator.clipboard.writeText(text);
+  btn.textContent = "✅ Disalin";
+  setTimeout(()=>btn.textContent="Copy",2000);
+}
 
-  function saveChat() {
-    localStorage.setItem('roja_chat', chatBox.innerHTML);
-    localStorage.setItem('roja_history', JSON.stringify(conversationHistory));
-  }
+function saveChat() {
+  localStorage.setItem('roja_chat', chatBox.innerHTML);
+  localStorage.setItem('roja_history', JSON.stringify(conversationHistory));
+}
 
-  function newChat() {
-    if (confirm("Mulai percakapan baru?")) {
-      chatBox.innerHTML = "";
-      conversationHistory = [];
-      appendBot("Percakapan baru dimulai. Halo, aku Roja AI 🤖");
-      saveChat();
-    }
-  }
+function newChat() {
+  if (confirm("Mulai percakapan baru?")) {
+    if (conversationHistory.length > 0) {
+      let savedAllHistory = JSON.parse(localStorage.getItem('roja_all_history') || "[]");
+      savedAllHistory.push([...conversationHistory]);
+      localStorage.setItem('roja_all_history', JSON.stringify(savedAllHistory));
+    }
+    chatBox.innerHTML = "";
+    conversationHistory = [];
+    appendBot("Percakapan baru dimulai. Halo, aku Roja AI 🤖");
+    saveChat();
+  }
+}
 
-  function toggleFullscreen() {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-    } else {
-      document.exitFullscreen();
-    }
-  }
+function toggleFullscreen() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
 
-  function copyText(btn) {
-    const text = btn.parentElement.querySelector("pre").innerText;
-    navigator.clipboard.writeText(text);
-    btn.textContent = "✅ Disalin";
-    setTimeout(() => btn.textContent = "Copy", 2000);
-  }
+input.addEventListener("keypress", e => { if (e.key==="Enter") sendMessage(); });
 
-  input.addEventListener("keypress", function(e) {
-    if (e.key === "Enter") sendMessage();
-  });
+openHistoryBtn.onclick = () => { chatHistoryPanel.style.right = "0"; renderHistory(); };
+function closeHistory() { chatHistoryPanel.style.right="-320px"; }
+
+function renderHistory() {
+  chatHistoryList.innerHTML="";
+  const allHistory = JSON.parse(localStorage.getItem('roja_all_history') || "[]");
+  if (allHistory.length===0) chatHistoryList.innerHTML='<li style="color:#aaa;">Belum ada percakapan sebelumnya.</li>';
+  else allHistory.forEach((conv, convIdx)=>{
+    const li=document.createElement('li');
+    li.style.background="#1b214033";
+    li.textContent=`[Percakapan ${convIdx+1}] ${conv.map(m=>m.content).join(" | ").substring(0,50)}${conv.map(m=>m.content).join(" ").length>50?"...":""}`;
+    li.onclick=()=>loadHistoryConversation(convIdx);
+    chatHistoryList.appendChild(li);
+  });
+}
+
+function loadHistoryConversation(convIdx) {
+  const allHistory=JSON.parse(localStorage.getItem('roja_all_history')||"[]");
+  if(!allHistory[convIdx]) return;
+  chatBox.innerHTML="";
+  conversationHistory=[...allHistory[convIdx]];
+  conversationHistory.forEach(msg=>{
+    if(msg.role==="user") appendUser(msg.content);
+    else appendBot(msg.content);
+  });
+  closeHistory();
+}
 </script>
-
 </body>
 </html>
