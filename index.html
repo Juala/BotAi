@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Roja AI Chat</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
   * { box-sizing: border-box; }
   body { 
-    font-family: 'Poppins', sans-serif; 
+    font-family: 'Inter', 'Poppins', sans-serif; 
     margin: 0; 
     background-color: #0a0f24; 
     color: #fff; 
@@ -34,6 +35,7 @@
     object-fit:cover; margin-right:10px; border:2px solid #0078ff; 
   }
   .chat-header h2 { margin:0; font-size:20px; font-weight:600; }
+
   .chat-header-right button { 
     background:#1f2745; border:none; color:#bbb; 
     font-size:14px; padding:6px 10px; border-radius:6px; 
@@ -46,11 +48,13 @@
     display:flex; flex-direction:column; 
     padding:15px; margin-top:75px; margin-bottom:80px; 
   }
+
+  /* Pesan */
   .message { 
-    margin:10px 0; max-width:75%; padding:12px 16px; 
-    border-radius:12px; line-height:1.6; 
+    margin:10px 0; max-width:75%; padding:14px 18px; 
+    border-radius:14px; line-height:1.6; 
     word-wrap:break-word; position:relative; 
-    animation:fadeIn 0.3s ease; 
+    font-size:15px; 
   }
   .user { 
     background:#0078ff; align-self:flex-end; 
@@ -61,8 +65,30 @@
     background:#1b2140; align-self:flex-start; 
     border-bottom-left-radius:0; margin-left:5px; 
     animation: bubbleLeft 0.35s ease;
+    font-family: 'Inter', sans-serif;
   }
-  .bot pre { margin:0; white-space:pre-wrap; }
+
+  /* ✨ Format balasan AI biar rapi */
+  .bot p {
+    margin: 6px 0;
+    line-height: 1.6;
+  }
+  .bot ul, .bot ol {
+    margin: 6px 0 6px 20px;
+    padding-left: 10px;
+  }
+  .bot pre, .bot code {
+    display: block;
+    background: #111831;
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-top: 6px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: #00d4ff;
+  }
 
   .typing-indicator { display:flex; align-items:center; gap:3px; }
   .typing-indicator span { 
@@ -74,7 +100,6 @@
   .typing-indicator span:nth-child(3) { animation-delay:0.4s; }
 
   @keyframes bounce { to { transform: translateY(-5px); } }
-  @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
   /* 🎈 Animasi gelembung chat */
   @keyframes bubbleLeft {
@@ -187,7 +212,7 @@ window.onload = function() {
     chatBox.innerHTML = saved;
     conversationHistory = JSON.parse(savedHistory || "[]");
   } else {
-    appendBot("Halo, aku Roja AI 🤖. Ada yang bisa aku bantu hari ini?");
+    appendBot("<p>Halo, aku <b>Roja AI</b> 🤖<br>Ada yang bisa aku bantu hari ini?</p>");
   }
   chatBox.scrollTop = chatBox.scrollHeight;
 };
@@ -210,6 +235,13 @@ async function sendMessage() {
     });
     const data = await res.json();
     let reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Tidak ada respons dari AI.";
+
+    // ✨ Format agar lebih rapi
+    reply = reply
+      .replace(/\n\s*\n/g, '</p><p>')
+      .replace(/\n/g, '<br>')
+      .replace(/^/, '<p>')
+      .concat('</p>');
 
     const isCodeRequest = /buatkan kode|html|css|javascript|js|php|python|csharp|java/i.test(msg);
     if (isCodeRequest) {
@@ -274,7 +306,7 @@ function newChat() {
     }
     chatBox.innerHTML = "";
     conversationHistory = [];
-    appendBot("Percakapan baru dimulai. Halo, aku Roja AI 🤖");
+    appendBot("<p>Percakapan baru dimulai.<br>Halo, aku <b>Roja AI</b> 🤖</p>");
     saveChat();
   }
 }
