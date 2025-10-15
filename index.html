@@ -10,331 +10,333 @@
     font-family: 'Poppins', sans-serif;
     margin: 0;
     background-color: #0a0f24;
-    color: #fff;
+    color: white;
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
   }
 
-  /* HEADER */
-  .chat-header {
+  header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 18px;
-    background: linear-gradient(135deg, #111831, #1c244a);
-    border-bottom: 1px solid #2a2f4a;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 10;
+    background-color: #101836;
+    padding: 10px 15px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.4);
   }
-  .chat-header-left { display: flex; align-items: center; }
-  .chat-header img {
-    width: 48px; height: 48px; border-radius: 50%;
-    object-fit: cover; margin-right: 10px; border: 2px solid #0078ff;
-  }
-  .chat-header h2 { margin: 0; font-size: 20px; font-weight: 600; }
 
-  .chat-header-right button {
-    background: #1f2745; border: none; color: #bbb;
-    font-size: 14px; padding: 6px 10px; border-radius: 6px;
-    cursor: pointer; transition: 0.3s; margin-left: 6px;
-  }
-  .chat-header-right button:hover {
-    color: #fff; background: #0078ff;
+  header img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
   }
 
-  /* CHAT BOX */
-  .chat-box {
+  .header-left {
+    display: flex;
+    align-items: center;
+  }
+
+  header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .header-buttons {
+    display: flex;
+    gap: 10px;
+  }
+
+  button {
+    background-color: #1a2347;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  button:hover { background-color: #2a3a6f; }
+
+  #chatContainer {
     flex: 1;
     overflow-y: auto;
-    scroll-behavior: smooth;
-    display: flex;
-    flex-direction: column;
     padding: 15px;
-    margin-top: 75px;
-    margin-bottom: 80px;
+    scroll-behavior: smooth;
   }
+
   .message {
     margin: 10px 0;
-    max-width: 75%;
-    padding: 12px 16px;
-    border-radius: 12px;
-    line-height: 1.6;
-    word-wrap: break-word;
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 10px;
+    line-height: 1.5;
     position: relative;
-    animation: fadeIn 0.3s ease;
-  }
-  .user { background: #0078ff; align-self: flex-end; border-bottom-right-radius: 0; }
-  .bot { background: #1b2140; align-self: flex-start; border-bottom-left-radius: 0; }
-  .bot pre { margin: 0; white-space: pre-wrap; }
-
-  .time {
-    font-size: 11px;
-    opacity: 0.6;
-    text-align: right;
-    margin-top: 4px;
   }
 
-  /* COPY BUTTON */
-  .copy-btn {
+  .bot {
+    background-color: #1a2347;
+    align-self: flex-start;
+  }
+
+  .user {
+    background-color: #007bff;
+    align-self: flex-end;
+    margin-left: auto;
+  }
+
+  .timestamp {
+    font-size: 10px;
+    color: rgba(255,255,255,0.6);
     position: absolute;
-    bottom: 8px; right: 8px;
-    background: #0078ff; color: white; border: none;
-    font-size: 12px; padding: 4px 8px; border-radius: 5px;
-    cursor: pointer; opacity: 0; transition: 0.2s;
-  }
-  .bot:hover .copy-btn { opacity: 1; }
-  .copy-btn:hover { background: #005ec3; }
-
-  /* INPUT */
-  .chat-input {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    display: flex; padding: 12px;
-    background: #141a35; border-top: 1px solid #2a2f4a;
-    z-index: 20;
-  }
-  .chat-input input {
-    flex: 1; padding: 10px 14px; border: none; border-radius: 8px;
-    font-size: 15px; outline: none; background: #1f2745; color: #fff;
-  }
-  .chat-input button {
-    background: #0078ff; color: #fff; border: none;
-    padding: 10px 18px; margin-left: 10px;
-    border-radius: 8px; cursor: pointer; transition: 0.2s;
-  }
-  .chat-input button:hover { background: #0060d4; }
-
-  /* FOOTER */
-  .footer {
-    text-align: center; padding: 8px; font-size: 12px; color: #aaa;
-    font-style: italic; position: fixed; bottom: 60px;
-    left: 0; right: 0; background: transparent;
+    bottom: -15px;
+    right: 10px;
   }
 
-  /* HISTORY MODAL */
-  .history-modal {
-    position: fixed;
-    top: 0; right: 0;
-    width: 320px; height: 100%;
-    background: #0e1430;
-    box-shadow: -2px 0 10px rgba(0,0,0,0.5);
-    transform: translateX(100%);
-    transition: transform 0.3s ease;
-    z-index: 30;
+  #inputArea {
     display: flex;
-    flex-direction: column;
-  }
-  .history-modal.active { transform: translateX(0); }
-  .history-header {
-    padding: 15px;
-    border-bottom: 1px solid #2a2f4a;
-    background: #1b2140;
-    font-weight: 600;
-    display: flex;
-    justify-content: space-between;
-  }
-  .history-list {
-    flex: 1;
-    overflow-y: auto;
     padding: 10px;
+    background-color: #101836;
   }
-  .history-item {
-    padding: 10px 12px;
-    border-bottom: 1px solid #2a2f4a;
+
+  #userInput {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    outline: none;
+  }
+
+  #sendBtn {
+    margin-left: 10px;
+    background-color: #007bff;
+  }
+
+  /* Loader mengetik 3 titik */
+  .typing {
+    display: inline-block;
+    margin-top: 10px;
+  }
+
+  .typing span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: #fff;
+    border-radius: 50%;
+    margin-right: 4px;
+    animation: blink 1.4s infinite both;
+  }
+
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes blink {
+    0%, 80%, 100% { opacity: 0; }
+    40% { opacity: 1; }
+  }
+
+  /* Popup Riwayat */
+  #historyPopup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #1a2347;
+    border-radius: 12px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.6);
+    display: none;
+    z-index: 100;
+  }
+
+  #historyPopup h3 {
+    margin-top: 0;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 5px;
+  }
+
+  #historyList {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  #historyList div {
+    background: #0f173a;
+    padding: 8px;
+    border-radius: 8px;
+    margin-bottom: 8px;
     cursor: pointer;
     transition: 0.2s;
   }
-  .history-item:hover { background: #1c244a; }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+  #historyList div:hover {
+    background: #223066;
   }
 </style>
 </head>
 <body>
 
-  <div class="chat-header">
-    <div class="chat-header-left">
-      <img src="roja-avatar.png" alt="Roja AI Avatar">
-      <h2>Roja AI</h2>
-    </div>
-    <div class="chat-header-right">
-      <button onclick="toggleHistory()">Riwayat</button>
-      <button onclick="newChat()">Percakapan Baru</button>
-      <button onclick="toggleFullscreen()">Fullscreen</button>
-    </div>
+<header>
+  <div class="header-left">
+    <img src="https://i.ibb.co/nM6DyG2/avatar.png" alt="avatar">
+    <h1>Roja AI</h1>
   </div>
-
-  <div class="chat-box" id="chatBox"></div>
-
-  <div class="chat-input">
-    <input id="userInput" type="text" placeholder="Ketik pesan..." />
-    <button onclick="sendMessage()">Kirim</button>
+  <div class="header-buttons">
+    <button onclick="showHistory()">Riwayat</button>
+    <button onclick="newChat()">Percakapan Baru</button>
+    <button onclick="toggleFullScreen()">Fullscreen</button>
   </div>
+</header>
 
-  <div class="footer">copyright@RojaServer | V2</div>
+<div id="chatContainer"></div>
 
-  <!-- PANEL RIWAYAT -->
-  <div class="history-modal" id="historyModal">
-    <div class="history-header">
-      <span>Riwayat Percakapan</span>
-      <button onclick="toggleHistory()">✖</button>
-    </div>
-    <div class="history-list" id="historyList"></div>
-  </div>
+<div id="inputArea">
+  <input type="text" id="userInput" placeholder="Ketik pesan..." />
+  <button id="sendBtn" onclick="sendMessage()">Kirim</button>
+</div>
+
+<!-- Popup Riwayat -->
+<div id="historyPopup">
+  <h3>Riwayat Percakapan</h3>
+  <div id="historyList"></div>
+  <button style="width:100%;margin-top:10px;" onclick="closeHistory()">Tutup</button>
+</div>
 
 <script>
-  const chatBox = document.getElementById('chatBox');
-  const input = document.getElementById('userInput');
-  const GEMINI_API_KEY = "AIzaSyC310duBltZgbkMMfqRoAn6qVELo7x2slI"; 
+  const chatContainer = document.getElementById('chatContainer');
+  const userInput = document.getElementById('userInput');
+  const GEMINI_API_KEY = "AIzaSyC310duBltZgbkMMfqRoAn6qVELo7x2slI"; // ← ganti dengan API key kamu
   const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
-  let conversationHistory = [];
-  let allChats = JSON.parse(localStorage.getItem('roja_allChats') || "[]");
+  let currentChat = [];
+  let chatHistory = JSON.parse(localStorage.getItem('roja_history')) || [];
 
-  window.onload = function() {
-    const saved = localStorage.getItem('roja_chat');
-    const savedHistory = localStorage.getItem('roja_history');
-    if (saved) {
-      chatBox.innerHTML = saved;
-      conversationHistory = JSON.parse(savedHistory || "[]");
-    } else {
-      appendBot("Halo, aku Roja AI 🤖. Ada yang bisa aku bantu hari ini?");
-    }
-    chatBox.scrollTop = chatBox.scrollHeight;
-  };
+  function addMessage(text, sender) {
+    const message = document.createElement('div');
+    message.classList.add('message', sender);
+
+    // Format teks bold/italic
+    let formatted = text
+      .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+      .replace(/\*(.*?)\*/g, '<i>$1</i>')
+      .replace(/`(.*?)`/g, '<code>$1</code>');
+
+    message.innerHTML = formatted;
+    const time = document.createElement('div');
+    time.classList.add('timestamp');
+    time.textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    message.appendChild(time);
+    chatContainer.appendChild(message);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+
+  function showTyping() {
+    const typing = document.createElement('div');
+    typing.classList.add('message', 'bot');
+    typing.id = 'typing';
+    typing.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+    chatContainer.appendChild(typing);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+
+  function removeTyping() {
+    const typing = document.getElementById('typing');
+    if (typing) typing.remove();
+  }
 
   async function sendMessage() {
-    const msg = input.value.trim();
-    if (!msg) return;
+    const text = userInput.value.trim();
+    if (!text) return;
 
-    appendUser(msg);
-    input.value = "";
-    appendBot("⏳ Roja AI sedang mengetik...");
+    addMessage(text, 'user');
+    currentChat.push({ sender: 'user', text });
+    userInput.value = '';
 
-    conversationHistory.push({ role: "user", content: msg });
+    showTyping();
+    const reply = await getGeminiResponse(text);
+    removeTyping();
 
+    addMessage(reply, 'bot');
+    currentChat.push({ sender: 'bot', text: reply });
+  }
+
+  async function getGeminiResponse(userText) {
     try {
-      const prompt = conversationHistory.map(m => `${m.role}: ${m.content}`).join("\n");
       const res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: userText }] }]
+        })
       });
 
       const data = await res.json();
-      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Tidak ada respons dari AI.";
-
-      const lastBot = chatBox.lastElementChild;
-      lastBot.innerHTML = `<pre>${reply}</pre><div class='time'>${getTime()}</div><button class="copy-btn" onclick="copyText(this)">Copy</button>`;
-      conversationHistory.push({ role: "model", content: reply });
-
+      return (
+        data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+        "⚠️ Tidak ada respons dari AI."
+      );
     } catch (err) {
       console.error(err);
-      chatBox.lastElementChild.textContent = "❌ Gagal menghubungi API Gemini.";
+      return "❌ Gagal menghubungi API Gemini.";
     }
-
-    saveChat();
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-
-  function appendUser(text) {
-    const div = document.createElement("div");
-    div.className = "message user";
-    div.innerHTML = `${text}<div class='time'>${getTime()}</div>`;
-    chatBox.appendChild(div);
-    saveChat();
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-
-  function appendBot(text) {
-    const div = document.createElement("div");
-    div.className = "message bot";
-    div.innerHTML = `<pre>${text}</pre><div class='time'>${getTime()}</div>`;
-    chatBox.appendChild(div);
-    saveChat();
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-
-  function getTime() {
-    const now = new Date();
-    return now.getHours().toString().padStart(2, '0') + '.' + now.getMinutes().toString().padStart(2, '0');
-  }
-
-  function saveChat() {
-    localStorage.setItem('roja_chat', chatBox.innerHTML);
-    localStorage.setItem('roja_history', JSON.stringify(conversationHistory));
   }
 
   function newChat() {
-    if (conversationHistory.length > 0) {
-      const title = generateTitle(conversationHistory);
-      allChats.push({ title, content: chatBox.innerHTML, history: conversationHistory, time: new Date().toLocaleString() });
-      localStorage.setItem('roja_allChats', JSON.stringify(allChats));
+    if (currentChat.length > 0) {
+      const title = currentChat.find(m => m.sender === 'user')?.text?.slice(0, 25) || 'Percakapan Baru';
+      chatHistory.push({ title, content: currentChat, time: new Date().toLocaleString() });
+      localStorage.setItem('roja_history', JSON.stringify(chatHistory));
     }
-
-    chatBox.innerHTML = "";
-    conversationHistory = [];
-    appendBot("Percakapan baru dimulai. Halo, aku Roja AI 🤖");
-    saveChat();
-    loadHistoryList();
+    currentChat = [];
+    chatContainer.innerHTML = '';
+    addMessage('Percakapan baru dimulai. Halo, aku Roja AI 🤖', 'bot');
   }
 
-  function generateTitle(history) {
-    const firstUserMessage = history.find(m => m.role === "user");
-    if (!firstUserMessage) return "Percakapan Tanpa Judul";
-    const text = firstUserMessage.content;
-    return text.length > 30 ? text.substring(0, 30) + "..." : text;
-  }
-
-  function toggleFullscreen() {
-    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-    else document.exitFullscreen();
-  }
-
-  function copyText(btn) {
-    const text = btn.parentElement.querySelector("pre").innerText;
-    navigator.clipboard.writeText(text);
-    btn.textContent = "✅ Disalin";
-    setTimeout(() => btn.textContent = "Copy", 2000);
-  }
-
-  function toggleHistory() {
-    const modal = document.getElementById('historyModal');
-    modal.classList.toggle('active');
-    loadHistoryList();
-  }
-
-  function loadHistoryList() {
+  function showHistory() {
+    const popup = document.getElementById('historyPopup');
     const list = document.getElementById('historyList');
-    list.innerHTML = "";
-    if (allChats.length === 0) {
-      list.innerHTML = "<p style='text-align:center;opacity:0.6;'>Belum ada riwayat.</p>";
-      return;
+    list.innerHTML = '';
+
+    if (chatHistory.length === 0) {
+      list.innerHTML = '<p>Belum ada riwayat percakapan.</p>';
+    } else {
+      chatHistory.forEach((h, i) => {
+        const div = document.createElement('div');
+        div.innerHTML = `<b>${h.title}</b><br><small>${h.time}</small>`;
+        div.onclick = () => loadChat(i);
+        list.appendChild(div);
+      });
     }
-    allChats.forEach((chat, index) => {
-      const item = document.createElement("div");
-      item.className = "history-item";
-      item.innerHTML = `<b>${chat.title}</b><br><small style='opacity:0.6;'>${chat.time}</small>`;
-      item.onclick = () => loadChat(index);
-      list.appendChild(item);
-    });
+    popup.style.display = 'block';
+  }
+
+  function closeHistory() {
+    document.getElementById('historyPopup').style.display = 'none';
   }
 
   function loadChat(index) {
-    const selected = allChats[index];
-    chatBox.innerHTML = selected.content;
-    conversationHistory = selected.history;
-    saveChat();
-    toggleHistory();
+    closeHistory();
+    const data = chatHistory[index];
+    chatContainer.innerHTML = '';
+    data.content.forEach(m => addMessage(m.text, m.sender));
+    currentChat = [...data.content];
   }
 
-  input.addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(); });
+  function toggleFullScreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  }
+
+  // Load chat awal
+  newChat();
 </script>
 
 </body>
