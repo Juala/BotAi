@@ -5,168 +5,390 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Roja AI Chat</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
-  * { box-sizing: border-box; }
-  body { font-family: 'Inter', 'Poppins', sans-serif; margin: 0; background-color: #0a0f24; color: #fff; display: flex; flex-direction: column; min-height: 100vh; }
-  .chat-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; background: linear-gradient(135deg, #111831, #1c244a); border-bottom: 1px solid #2a2f4a; position: fixed; top: 0; left: 0; right: 0; z-index: 10; box-shadow: 0 2px 10px rgba(0,0,0,0.4); }
-  .chat-header-left { display: flex; align-items: center; }
-  .chat-header img { width:48px; height:48px; border-radius:50%; object-fit:cover; margin-right:10px; border:2px solid #0078ff; }
-  .chat-header h2 { margin:0; font-size:20px; font-weight:600; }
-  .chat-header-right button { background:#1f2745; border:none; color:#bbb; font-size:14px; padding:6px 10px; border-radius:6px; cursor:pointer; transition:0.3s; }
-  .chat-header-right button:hover { color:#fff; background:#0078ff; }
-  .chat-box { flex:1; overflow-y:auto; scroll-behavior:smooth; display:flex; flex-direction:column; padding:15px; margin-top:75px; margin-bottom:80px; }
-  .message { margin:10px 0; max-width:75%; padding:14px 18px; border-radius:14px; line-height:1.6; word-wrap:break-word; position:relative; font-size:15px; }
-  .user { background:#0078ff; align-self:flex-end; border-bottom-right-radius:0; margin-right:5px; animation:bubbleRight 0.35s ease; }
-  .bot { background:#1b2140; align-self:flex-start; border-bottom-left-radius:0; margin-left:5px; animation:bubbleLeft 0.35s ease; font-family: 'Inter', sans-serif; }
-  .bot p { margin:6px 0; line-height:1.6; }
-  .bot pre, .bot code { display: block; background: #111831; border-radius: 8px; padding: 8px 10px; margin-top: 6px; white-space: pre-wrap; word-wrap: break-word; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #00d4ff; }
-  .typing-indicator { display:flex; align-items:center; gap:3px; }
-  .typing-indicator span { width:6px; height:6px; background:#0078ff; border-radius:50%; display:inline-block; animation:bounce 0.6s infinite alternate; }
-  .typing-indicator span:nth-child(2) { animation-delay:0.2s; }
-  .typing-indicator span:nth-child(3) { animation-delay:0.4s; }
-  @keyframes bounce { to { transform: translateY(-5px); } }
-  @keyframes bubbleLeft { 0% { transform: scale(0.8) translateX(-10px); opacity: 0; } 60% { transform: scale(1.05) translateX(3px); opacity: 1; } 100% { transform: scale(1) translateX(0); opacity: 1; } }
-  @keyframes bubbleRight { 0% { transform: scale(0.8) translateX(10px); opacity: 0; } 60% { transform: scale(1.05) translateX(-3px); opacity: 1; } 100% { transform: scale(1) translateX(0); opacity: 1; } }
-  .copy-btn { position:absolute; bottom:8px; right:8px; background:#0078ff; color:white; border:none; font-size:12px; padding:4px 8px; border-radius:5px; cursor:pointer; opacity:0; transition:0.2s; }
-  .bot:hover .copy-btn { opacity:1; }
-  .copy-btn:hover { background:#005ec3; }
-  .chat-input { position:fixed; bottom:0; left:0; right:0; display:flex; padding:12px; background:#141a35; border-top:1px solid #2a2f4a; z-index:20; }
-  .chat-input input { flex:1; padding:10px 14px; border:none; border-radius:8px; font-size:15px; outline:none; background:#1f2745; color:#fff; }
-  .chat-input button { background:#0078ff; color:#fff; border:none; padding:10px 18px; margin-left:10px; border-radius:8px; cursor:pointer; transition:0.2s; }
-  .chat-input button:hover { background:#0060d4; }
-  .footer { text-align:center; padding:8px; font-size:12px; color:#aaa; font-style:italic; position:fixed; bottom:60px; left:0; right:0; background:transparent; }
-  #chatHistoryPanel { position:fixed; top:75px; right:-320px; width:300px; height:calc(100% - 75px); background:#141a35; border-left:1px solid #2a2f4a; overflow-y:auto; transition:0.3s; padding:10px; z-index:15; }
-  #chatHistoryPanel h3 { color:#fff; font-size:16px; margin-bottom:10px; }
-  #openHistoryBtn { position:fixed; top:85px; right:10px; z-index:20; padding:6px 10px; border:none; background:#1f2745; color:#fff; border-radius:6px; cursor:pointer; }
-  .preview-img { max-width: 200px; border-radius: 10px; margin-top: 8px; }
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    background-color: #0a0f24;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    background: linear-gradient(135deg, #111831, #1c244a);
+    border-bottom: 1px solid #2a2f4a;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+  }
+
+  .chat-header-left {
+    display: flex;
+    align-items: center;
+  }
+
+  .chat-header img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+    border: 2px solid #0078ff;
+  }
+
+  .chat-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .chat-header-right button {
+    background: #1f2745;
+    border: none;
+    color: #bbb;
+    font-size: 14px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .chat-header-right button:hover {
+    color: #fff;
+    background: #0078ff;
+  }
+
+  /* CHAT BOX */
+  .chat-box {
+    flex: 1;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    margin-top: 75px;
+    margin-bottom: 80px;
+  }
+
+  .message {
+    margin: 10px 0;
+    max-width: 75%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    line-height: 1.6;
+    word-wrap: break-word;
+    position: relative;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .user {
+    background: #0078ff;
+    align-self: flex-end;
+    border-bottom-right-radius: 0;
+    margin-right: 5px;
+  }
+
+  .bot {
+    background: #1b2140;
+    align-self: flex-start;
+    border-bottom-left-radius: 0;
+    margin-left: 5px;
+  }
+
+  .bot pre {
+    margin: 0;
+    white-space: pre-wrap;
+  }
+
+  /* COPY BUTTON */
+  .copy-btn {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: #0078ff;
+    color: white;
+    border: none;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    opacity: 0;
+    transition: 0.2s;
+  }
+
+  .bot:hover .copy-btn {
+    opacity: 1;
+  }
+
+  .copy-btn:hover {
+    background: #005ec3;
+  }
+
+  /* INPUT */
+  .chat-input {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background: #141a35;
+    border-top: 1px solid #2a2f4a;
+    z-index: 20;
+  }
+
+  .chat-input input {
+    flex: 1;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    background: #1f2745;
+    color: #fff;
+  }
+
+  .chat-input button {
+    background: #0078ff;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    margin-left: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  .chat-input button:hover {
+    background: #0060d4;
+  }
+
+  /* FILE UPLOAD BUTTON */
+  #fileInput {
+    display: none;
+  }
+
+  .upload-label {
+    background: #1f2745;
+    border-radius: 8px;
+    padding: 10px;
+    margin-left: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .upload-label:hover {
+    background: #2a3460;
+  }
+
+  .preview-img {
+    max-width: 200px;
+    border-radius: 10px;
+    margin-top: 8px;
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    padding: 8px;
+    font-size: 12px;
+    color: #aaa;
+    font-style: italic;
+    position: fixed;
+    bottom: 60px;
+    left: 0;
+    right: 0;
+    background: transparent;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 </style>
 </head>
 <body>
 
-<div class="chat-header">
-  <div class="chat-header-left">
-    <img src="roja-avatar.png" alt="Roja AI Avatar">
-    <h2>Roja AI</h2>
-  </div>
-  <div class="chat-header-right">
-    <button onclick="newChat()">Percakapan Baru</button>
-    <button onclick="toggleFullscreen()">Fullscreen</button>
-  </div>
-</div>
+  <div class="chat-header">
+    <div class="chat-header-left">
+      <img src="roja-avatar.png" alt="Roja AI Avatar">
+      <h2>Roja AI</h2>
+    </div>
+    <div class="chat-header-right">
+      <button onclick="newChat()">Percakapan Baru</button>
+      <button onclick="toggleFullscreen()">Fullscreen</button>
+    </div>
+  </div>
 
-<div class="chat-box" id="chatBox"></div>
+  <div class="chat-box" id="chatBox"></div>
 
-<div class="chat-input">
-  <input id="userInput" type="text" placeholder="Ketik pesan..." />
-  <button onclick="sendMessage()">Kirim</button>
-  <input type="file" id="imageUpload" accept="image/*" style="display:none">
-  <button onclick="document.getElementById('imageUpload').click()">📎</button>
-</div>
+  <div class="chat-input">
+    <input id="userInput" type="text" placeholder="Ketik pesan..." />
+    <label for="fileInput" class="upload-label">📎</label>
+    <input type="file" id="fileInput" accept="image/*">
+    <button onclick="sendMessage()">Kirim</button>
+  </div>
 
-<div class="footer">copyright@RojaServer | V2</div>
-
-<div id="chatHistoryPanel">
-  <h3>Riwayat Chat</h3>
-  <ul id="chatHistoryList"></ul>
-  <button onclick="closeHistory()">Tutup</button>
-</div>
-<button id="openHistoryBtn">Riwayat</button>
+  <div class="footer">copyright@RojaServer | V2</div>
 
 <script>
-const chatBox = document.getElementById('chatBox');
-const input = document.getElementById('userInput');
-const imageUpload = document.getElementById('imageUpload');
+  const chatBox = document.getElementById('chatBox');
+  const input = document.getElementById('userInput');
+  const fileInput = document.getElementById('fileInput');
+  const GEMINI_API_KEY = "AIzaSyC310duBltZgbkMMfqRoAn6qVELo7x2slI";
+  const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 
-const GEMINI_API_KEY = "AIzaSyC310duBltZgbkMMfqRoAn6qVELo7x2slI";
-const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+  let conversationHistory = [];
 
-window.onload = () => {
-  const saved = localStorage.getItem('roja_chat');
-  if (saved) chatBox.innerHTML = saved;
-  else appendBot("<p>Halo, aku <b>Roja AI</b> 🤖<br>Ada yang bisa aku bantu hari ini?</p>");
-  chatBox.scrollTop = chatBox.scrollHeight;
-};
+  window.onload = function() {
+    const saved = localStorage.getItem('roja_chat');
+    const savedHistory = localStorage.getItem('roja_history');
+    if (saved) {
+      chatBox.innerHTML = saved;
+      conversationHistory = JSON.parse(savedHistory || "[]");
+    } else {
+      appendBot("Halo, aku Roja AI 🤖. Kirim pesan atau upload gambar untuk aku analisis!");
+    }
+    chatBox.scrollTop = chatBox.scrollHeight;
+  };
 
-async function sendMessage(msg = null, imageData = null) {
-  const message = msg || input.value.trim();
-  if (!message && !imageData) return;
+  async function sendMessage() {
+    const msg = input.value.trim();
+    if (!msg) return;
 
-  if (message) appendUser(message);
-  input.value = "";
-  const typingDiv = appendBot("", true);
+    appendUser(msg);
+    input.value = "";
+    appendBot("⏳ Roja AI sedang mengetik...");
 
-  try {
-    const body = {
-      contents: [
-        { parts: imageData
-            ? [{ text: message || "Analisis gambar ini" }, { inlineData: { mimeType: "image/jpeg", data: imageData } }]
-            : [{ text: message }]
-        }
-      ]
-    };
+    conversationHistory.push({ role: "user", content: msg });
 
-    const res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
+    try {
+      const prompt = conversationHistory.map(m => `${m.role}: ${m.content}`).join("\n");
 
-    const data = await res.json();
-    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Tidak ada respons dari AI.";
-    typingDiv.innerHTML = `<p>${reply.replace(/\n/g, "<br>")}</p><button class='copy-btn' onclick='copyText(this)'>Copy</button>`;
-  } catch (e) {
-    typingDiv.innerHTML = "<p>❌ Gagal menghubungi AI. Periksa koneksi atau API key kamu.</p>";
-  }
+      const res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+      });
 
-  chatBox.scrollTop = chatBox.scrollHeight;
-  localStorage.setItem('roja_chat', chatBox.innerHTML);
-}
+      const data = await res.json();
+      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Tidak ada respons dari AI.";
 
-imageUpload.addEventListener("change", () => {
-  const file = imageUpload.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const base64 = e.target.result.split(",")[1];
-    appendUser(`<img src="${e.target.result}" class="preview-img"><br><i>📷 Menganalisis gambar...</i>`);
-    sendMessage("Analisis gambar ini", base64);
-  };
-  reader.readAsDataURL(file);
-});
+      const lastBot = chatBox.lastElementChild;
+      lastBot.innerHTML = `<pre>${reply}</pre><button class="copy-btn" onclick="copyText(this)">Copy</button>`;
+      conversationHistory.push({ role: "model", content: reply });
 
-function appendUser(text) {
-  const div = document.createElement("div");
-  div.className = "message user";
-  div.innerHTML = text;
-  chatBox.appendChild(div);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-function appendBot(text, typing=false) {
-  const div = document.createElement("div");
-  div.className = "message bot";
-  div.innerHTML = typing ? "<div class='typing-indicator'><span></span><span></span><span></span></div>" : text;
-  chatBox.appendChild(div);
-  chatBox.scrollTop = chatBox.scrollHeight;
-  return div;
-}
-function copyText(btn) {
-  const text = btn.parentElement.innerText.replace("Copy", "").trim();
-  navigator.clipboard.writeText(text);
-  btn.textContent = "✅ Disalin";
-  setTimeout(()=>btn.textContent="Copy",2000);
-}
-function newChat() {
-  if (confirm("Mulai percakapan baru?")) {
-    chatBox.innerHTML = "";
-    appendBot("<p>Percakapan baru dimulai.<br>Halo, aku <b>Roja AI</b> 🤖</p>");
-    localStorage.setItem('roja_chat', chatBox.innerHTML);
-  }
-}
-function
- toggleFullscreen() {
-  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-  else document.exitFullscreen();
-}
+    } catch (err) {
+      console.error(err);
+      chatBox.lastElementChild.textContent = "❌ Gagal menghubungi API Gemini.";
+    }
+
+    saveChat();
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  // 🔹 Fungsi upload & analisis gambar
+  fileInput.addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const base64 = e.target.result.split(',')[1];
+      appendUser(`<img src="${e.target.result}" class="preview-img"><br><i>📷 Gambar dikirim...</i>`);
+      appendBot("⏳ Sedang menganalisis gambar...");
+
+      try {
+        const res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{
+              parts: [
+                { text: "Jelaskan isi gambar ini secara singkat dan informatif." },
+                { inlineData: { mimeType: file.type, data: base64 } }
+              ]
+            }]
+          })
+        });
+
+        const data = await res.json();
+        const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Tidak ada respons dari AI.";
+        const lastBot = chatBox.lastElementChild;
+        lastBot.innerHTML = `<pre>${reply}</pre><button class="copy-btn" onclick="copyText(this)">Copy</button>`;
+      } catch (err) {
+        console.error(err);
+        chatBox.lastElementChild.textContent = "❌ Gagal memproses gambar.";
+      }
+
+      saveChat();
+      chatBox.scrollTop = chatBox.scrollHeight;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  function appendUser(text) {
+    const div = document.createElement("div");
+    div.className = "message user";
+    div.innerHTML = text;
+    chatBox.appendChild(div);
+    saveChat();
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function appendBot(text) {
+    const div = document.createElement("div");
+    div.className = "message bot";
+    div.innerHTML = `<pre>${text}</pre>`;
+    chatBox.appendChild(div);
+    saveChat();
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function saveChat() {
+    localStorage.setItem('roja_chat', chatBox.innerHTML);
+    localStorage.setItem('roja_history', JSON.stringify(conversationHistory));
+  }
+
+  function newChat() {
+    if (confirm("Mulai percakapan baru?")) {
+      chatBox.innerHTML = "";
+      conversationHistory = [];
+      appendBot("Percakapan baru dimulai. Kirim pesan atau upload gambar untuk aku analisis!");
+      saveChat();
+    }
+  }
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  }
+
+  function copyText(btn) {
+    const text = btn.parentElement.querySelector("pre").innerText;
+    navigator.clipboard.writeText(text);
+    btn.textContent = "✅ Disalin";
+    setTimeout(() => btn.textContent = "Copy", 2000);
+  }
+
+  input.addEventListener("keypress", function(e) {
+    if (e.key === "Enter") sendMessage();
+  });
 </script>
 </body>
 </html>
