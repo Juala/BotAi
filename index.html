@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Roja AI Chat</title>
 <style>
   * { box-sizing: border-box; }
@@ -78,9 +78,21 @@
     background: #141a35; border-top: 1px solid #2a2f4a;
     z-index: 20;
   }
-  .chat-input input {
-    flex: 1; padding: 10px 14px; border: none; border-radius: 8px;
-    font-size: 15px; outline: none; background: #1f2745; color: #fff;
+  /* GANTI INPUT MENJADI TEXTAREA */
+  .chat-input textarea {
+    flex: 1;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    background: #1f2745;
+    color: #fff;
+    resize: none;
+    overflow-y: auto;
+    max-height: 100px;
+    line-height: 1.4;
+    font-family: 'Poppins', sans-serif;
   }
   .chat-input button {
     background: #0078ff; color: #fff; border: none;
@@ -145,7 +157,7 @@
 
   <div class="chat-header">
     <div class="chat-header-left">
-      <img src="roja-avatar.png" alt="Roja AI Avatar">
+      <img src="roja-avatar.png" alt="Roja AI Avatar" />
       <h2>Roja AI</h2>
     </div>
     <div class="chat-header-right">
@@ -158,7 +170,8 @@
   <div class="chat-box" id="chatBox"></div>
 
   <div class="chat-input">
-    <input id="userInput" type="text" placeholder="Ketik pesan..." />
+    <!-- GANTI input MENJADI textarea -->
+    <textarea id="userInput" placeholder="Ketik pesan..." rows="1"></textarea>
     <button onclick="sendMessage()">Kirim</button>
   </div>
 
@@ -199,6 +212,7 @@
 
     appendUser(msg);
     input.value = "";
+    autoResizeTextarea();
 
     const typingDiv = appendTyping();
 
@@ -331,7 +345,21 @@
     toggleHistory();
   }
 
-  input.addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(); });
+  // Auto expand textarea agar teks panjang tetap terlihat rapi
+  function autoResizeTextarea() {
+    input.style.height = 'auto';
+    input.style.height = input.scrollHeight + 'px';
+  }
+
+  input.addEventListener("input", autoResizeTextarea);
+
+  // Enter untuk kirim pesan, Shift+Enter untuk newline
+  input.addEventListener("keypress", e => { 
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
 
   // Markdown ke HTML rapi
   function formatMarkdown(text) {
@@ -345,6 +373,8 @@
       .replace(/^- (.*$)/gim, "<li>$1</li>")
       .replace(/\n/g, "<br>");
   }
+
 </script>
+
 </body>
 </html>
